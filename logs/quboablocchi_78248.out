@@ -1,0 +1,137 @@
+Job ID: 78248
+Node: acnode03.e4red
+CUDA_VISIBLE_DEVICES=0
+Start: Fri Aug  7 14:47:44 CEST 2026
+density: 100.0
+
+========================================================================
+MATRICE QUBO ORIGINALE
+========================================================================
+Shape                 : (256, 256)
+Numero di variabili   : 256
+Numero di cluster     : 16
+Dimensione dei blocchi: 16
+Matrice simmetrica    : True
+Cluster ottimali      : [array([  1,   8,  17,  28,  83,  94, 121, 122, 135, 140, 173, 185, 194, 195, 233, 252]), array([  9,  19,  21,  35,  37,  46,  79,  93,  96,  99, 115, 138, 160, 199, 222, 248]), array([ 24,  44,  51,  95,  97, 110, 124, 131, 142, 154, 157, 164, 166, 170, 183, 230]), array([ 54,  59,  84, 104, 132, 146, 175, 180, 196, 206, 207, 209, 218, 220, 223, 234]), array([  2,  15,  38,  45,  47,  68,  71,  88, 109, 113, 123, 151, 153, 201, 243, 250]), array([ 36,  53,  78,  81,  90, 101, 106, 163, 167, 182, 189, 190, 193, 221, 241, 253]), array([ 18,  31,  56,  60,  66,  73,  82, 125, 130, 174, 188, 208, 238, 239, 251, 255]), array([  4,  22,  25,  58,  63,  69,  74,  76,  98, 100, 111, 118, 141, 158, 240, 246]), array([ 14,  39,  52,  57,  72,  85, 120, 134, 145, 147, 148, 176, 198, 203, 229, 236]), array([ 23,  32,  65,  70,  86, 107, 112, 114, 127, 143, 156, 159, 171, 231, 235, 237]), array([  7,  29,  61,  80,  87, 102, 117, 155, 169, 172, 181, 186, 200, 211, 217, 225]), array([  5,  10,  30,  33,  41,  43,  50,  67,  89, 128, 144, 213, 227, 228, 249, 254]), array([  3,  16,  40,  49, 108, 119, 126, 133, 150, 152, 161, 168, 178, 215, 224, 242]), array([ 11,  13,  27,  34,  48,  55,  91, 184, 187, 197, 204, 210, 212, 219, 244, 245]), array([  0,  12,  20,  42,  64,  92, 137, 139, 149, 177, 179, 191, 192, 202, 205, 216]), array([  6,  26,  62,  75,  77, 103, 105, 116, 129, 136, 162, 165, 214, 226, 232, 247])]
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-1.9177733041964685e-16, 0.2079571017912601, 0.23257634888730389, 0.2692311192160465, 0.28125485634841163, 0.2834294108949177, 0.2934199336003753, 0.29943273448810737, 0.3140669476181447, 0.31953668670882207, 0.324077814031715, 0.3273618658956714, 0.32836546093216934, 0.34521146178496576, 0.35382666347801994, 0.36458609577833045]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-2.27659020811323e-16, 0.1381403991207356, 0.14504204061003217, 0.16987699160803726, 0.1733841192276332, 0.18104106514766705, 0.19809049753797847, 0.19921069273093778, 0.2133715999217592, 0.218294945564873, 0.22018651957260693, 0.23421243382813445, 0.24831119310551408, 0.26785543675758944, 0.2806355394490199, 0.30126692799358573]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[-2.3531333562499267e-16, 0.061144530069549896, 0.06289805338516422, 0.06439685144048504, 0.06640290353049999, 0.06927134959069248, 0.07783546911195471, 0.08343743622360134, 0.09137357359308168, 0.09947870771994263, 0.10744793491891852, 0.10816947227032567, 0.13868707847902217, 0.15811034593475376, 0.1909360360640201, 0.22065271632054073]
+[GMC-CPU] iter=4 components=4 lambda=16 eigenvalues=[-1.277443292950077e-16, 1.940995212002381e-17, 1.940995212002381e-17, 1.940995212002381e-17, 0.0033407398218383367, 0.004445633799554732, 0.01276032718590412, 0.028882402971747226, 0.03064361086890731, 0.03994174359632591, 0.04650612052191, 0.053964467905841404, 0.07104215846295116, 0.07419405829625829, 0.10170103901330575, 0.1276268007855746]
+[GMC-CPU] iter=5 components=11 lambda=32 eigenvalues=[-2.5442484202629945e-16, -2.5442484202629945e-16, -2.5442484202629945e-16, -2.5442484202629945e-16, -2.5442484202629945e-16, -2.5442484202629945e-16, -1.5503441719208843e-16, 2.580367285494959e-16, 2.580367285494959e-16, 2.580367285494959e-16, 2.580367285494959e-16, 0.015244626053577341, 0.02163470778055556, 0.02690600893383943, 0.03828331020168405, 0.043921753846201415]
+[GMC-CPU] iter=6 components=15 lambda=64 eigenvalues=[-7.73057896939643e-16, -1.8504144662481127e-16, -1.8504144662481127e-16, -1.8504144662481127e-16, -1.8504144662481127e-16, -1.8504144662481127e-16, -1.6686350927418163e-16, 4.0297500369002044e-16, 4.0297500369002044e-16, 4.0297500369002044e-16, 4.0297500369002044e-16, 4.0297500369002044e-16, 4.0297500369002044e-16, 4.0297500369002044e-16, 4.0297500369002044e-16, 0.019583070375349298]
+[GMC-CPU] iter=7 components=15 lambda=128 eigenvalues=[-6.957953058370505e-16, -6.957953058370505e-16, -1.0897689032240091e-16, -1.0897689032240091e-16, -1.0897689032240091e-16, -1.0897689032240091e-16, -1.0897689032240091e-16, -1.0897689032240091e-16, -1.0897689032240091e-16, -1.0897689032240091e-16, 1.2156123067745444e-16, 4.778415251922488e-16, 4.778415251922488e-16, 4.778415251922488e-16, 4.778415251922488e-16, 0.014315542502973832]
+[GMC-CPU] iter=8 components=16 lambda=128 eigenvalues=[-7.549763727857978e-16, -1.6156575420285705e-16, -1.6156575420285705e-16, -1.6156575420285705e-16, -1.6156575420285705e-16, -1.6156575420285705e-16, -1.6156575420285705e-16, -1.6156575420285705e-16, -1.6156575420285705e-16, 6.052182637084109e-17, 4.318448643800836e-16, 4.318448643800836e-16, 4.318448643800836e-16, 4.318448643800836e-16, 4.318448643800836e-16, 4.318448643800836e-16]
+Fine GMC diretto.
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[4.746945382357452e-16, 0.24415982694832236]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[6.62653651913263e-16, 0.22377637113133053]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[1.8886142969436241e-16, 0.1907131731178237]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[-4.225921018996399e-16, 0.14074214279646874]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[2.1932209694487981e-16, 0.08127936557521125]
+[GMC-CPU] iter=6 components=1 lambda=64 eigenvalues=[1.1653276607466766e-16, 0.027164963262665084]
+[GMC-CPU] iter=7 components=1 lambda=128 eigenvalues=[4.4134742466034335e-16, 0.005212168789270595]
+[GMC-CPU] iter=8 components=1 lambda=256 eigenvalues=[-2.0495776840809194e-16, 0.0025610910922291633]
+[GMC-CPU] iter=9 components=2 lambda=256 eigenvalues=[9.410333130727385e-17, 9.410333130727385e-17]
+[Hierarchy-CPU] node=0 components=2 leaves=2 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[5.404817184195629e-16, 0.25323819970916966]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[3.410499088499627e-17, 0.1904699170239545]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[-2.4625005674737236e-16, 0.10286381569887618]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[2.5686353927008377e-16, 0.0453293973014888]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[-4.1798885616334424e-16, 0.015297810770444774]
+[GMC-CPU] iter=6 components=2 lambda=32 eigenvalues=[1.6596597734294233e-16, 1.6596597734294233e-16]
+[Hierarchy-CPU] node=1 components=2 leaves=3 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[2.9009096697666107e-17, 0.23818238890749466]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-8.05593289316967e-17, 0.14727475284531188]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[-1.126247595885959e-16, 0.04709273357583904]
+[GMC-CPU] iter=4 components=2 lambda=8 eigenvalues=[-3.839833699209129e-16, -3.839833699209129e-16]
+[Hierarchy-CPU] node=2 components=2 leaves=4 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-1.9545186952428666e-16, 0.2907961806711975]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-2.2577258370896927e-16, 0.2519771903367569]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[2.308104520437926e-16, 0.1965252148592461]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[-1.0947692377102804e-16, 0.1420981307800161]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[1.469837390639549e-17, 0.06933348724642809]
+[GMC-CPU] iter=6 components=1 lambda=64 eigenvalues=[-7.228434874457428e-18, 0.006701352070367713]
+[GMC-CPU] iter=7 components=2 lambda=64 eigenvalues=[2.0769540682461609e-16, 2.0769540682461609e-16]
+[Hierarchy-CPU] node=5 components=2 leaves=5 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[3.4505700128379054e-17, 0.27843300602127663]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[3.981978485162992e-17, 0.2350122455247924]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[5.023894379589723e-16, 0.1606687494257208]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[2.4816792103719873e-16, 0.08636254962083051]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[-2.341076432193724e-16, 0.044839647672292676]
+[GMC-CPU] iter=6 components=1 lambda=64 eigenvalues=[7.427772250167368e-18, 0.010957611757449998]
+[GMC-CPU] iter=7 components=1 lambda=128 eigenvalues=[3.727220283401077e-17, 0.003465711170017466]
+[GMC-CPU] iter=8 components=2 lambda=128 eigenvalues=[-3.88743534150165e-16, 3.5432210445711946e-16]
+[Hierarchy-CPU] node=3 components=2 leaves=6 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-5.570535867495424e-16, 0.28037666371670944]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[2.9021030737498214e-16, 0.22578192982727455]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[-3.871319856325885e-16, 0.14072286220112018]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[4.2072604588132946e-17, 0.04685017609625204]
+[GMC-CPU] iter=5 components=2 lambda=16 eigenvalues=[5.62737352773965e-17, 4.574295410650854e-16]
+[Hierarchy-CPU] node=7 components=2 leaves=7 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[6.70561172396081e-16, 0.28017669422717606]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-2.5778005543594747e-16, 0.19675977526843547]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[1.0642177742298961e-16, 0.09156866116200506]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[1.5943564470285442e-17, 0.03409785419098354]
+[GMC-CPU] iter=5 components=2 lambda=16 eigenvalues=[-2.246488551753627e-17, -2.246488551753627e-17]
+[Hierarchy-CPU] node=11 components=2 leaves=8 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-1.8253759059152089e-16, 0.27827853914005196]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-5.767103260802902e-16, 0.2172115081719464]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[1.1508949524072071e-16, 0.15026538664972064]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[-3.479144324943285e-16, 0.08041904793462347]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[1.5334073502960803e-16, 0.010470180494232761]
+[GMC-CPU] iter=6 components=2 lambda=32 eigenvalues=[-2.6757088025188656e-16, 3.3748071946476984e-16]
+[Hierarchy-CPU] node=9 components=2 leaves=9 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[1.6181486919991486e-16, 0.29499607357115226]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-1.666560609262642e-16, 0.24415725612072153]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[1.8948837464945225e-16, 0.14638863419375647]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[-3.43512400365733e-16, 0.016345404831446274]
+[GMC-CPU] iter=5 components=2 lambda=16 eigenvalues=[1.6965202220496384e-16, 1.6965202220496384e-16]
+[Hierarchy-CPU] node=13 components=2 leaves=10 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[1.7776209809936036e-16, 0.2970090872414646]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-8.973231845727157e-17, 0.23673740152466974]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[-3.6205721012031625e-16, 0.1429627284022118]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[2.6971768129850045e-16, 0.045709956194064184]
+[GMC-CPU] iter=5 components=2 lambda=16 eigenvalues=[-4.835519428395979e-16, 2.7832334691964996e-16]
+[Hierarchy-CPU] node=17 components=2 leaves=11 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-1.1236877819361282e-16, 0.28942093499740174]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[1.980603064460481e-16, 0.22818585978965658]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[-4.080290815249352e-16, 0.13746414984976663]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[-6.132427920316083e-16, 0.06527900705302017]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[-5.128453341489796e-16, 0.04583508331909125]
+[GMC-CPU] iter=6 components=2 lambda=32 eigenvalues=[-1.7534332167680143e-16, 2.459858915822418e-16]
+[Hierarchy-CPU] node=16 components=2 leaves=12 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-1.4982616225357885e-16, 0.2774229295015695]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[7.599321713764773e-16, 0.1960763284987708]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[2.3620061800849945e-16, 0.10118286942233654]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[9.767459937995333e-17, 0.030283340215175716]
+[GMC-CPU] iter=5 components=2 lambda=16 eigenvalues=[-1.414778167379752e-16, -1.414778167379752e-16]
+[Hierarchy-CPU] node=21 components=2 leaves=13 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-2.6040642524673807e-16, 0.29808887314573396]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[3.9903790928289236e-17, 0.25207985545039097]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[1.258881974484744e-16, 0.19279151579601078]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[3.344807341919614e-17, 0.1148906414463392]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[2.1896151486947264e-17, 0.05197056000327059]
+[GMC-CPU] iter=6 components=1 lambda=64 eigenvalues=[-1.5513953096029185e-16, 0.02040536327932921]
+[GMC-CPU] iter=7 components=1 lambda=128 eigenvalues=[1.9577210421088556e-16, 0.012949634340607225]
+[GMC-CPU] iter=8 components=1 lambda=256 eigenvalues=[-6.673571988470707e-16, 0.002402914004533494]
+[GMC-CPU] iter=9 components=2 lambda=256 eigenvalues=[-3.8052653928043734e-16, 1.945908075908807e-16]
+[Hierarchy-CPU] node=19 components=2 leaves=14 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-4.3032166446913764e-16, 0.3012589541513389]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-2.5621043267105655e-16, 0.25616250082773273]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[3.671163948930433e-17, 0.18782285430761073]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[9.365591101696169e-17, 0.11392138964747218]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[3.258787145313737e-17, 0.050694934181433435]
+[GMC-CPU] iter=6 components=2 lambda=32 eigenvalues=[2.461537527205328e-16, 7.834718852803714e-16]
+[Hierarchy-CPU] node=24 components=2 leaves=15 target=16
+[GMC-CPU] iter=1 components=1 lambda=2 eigenvalues=[-6.860549834181882e-16, 0.27993847567692914]
+[GMC-CPU] iter=2 components=1 lambda=4 eigenvalues=[-4.1759583405722063e-16, 0.22011878784436417]
+[GMC-CPU] iter=3 components=1 lambda=8 eigenvalues=[6.350210392174608e-17, 0.14278275071779264]
+[GMC-CPU] iter=4 components=1 lambda=16 eigenvalues=[-3.2992985183753216e-16, 0.07681429190866593]
+[GMC-CPU] iter=5 components=1 lambda=32 eigenvalues=[-9.3614470257236e-17, 0.043050563962107255]
+[GMC-CPU] iter=6 components=1 lambda=64 eigenvalues=[1.6615683871422826e-17, 0.008538231275386393]
+[GMC-CPU] iter=7 components=2 lambda=64 eigenvalues=[-1.0283150247474924e-16, 5.690188804306224e-16]
+[Hierarchy-CPU] node=25 components=2 leaves=16 target=16
+GPU disponibile.
+
+Esecuzione del GMC GPU in modalità parallela.
+[Hierarchy-GPU] level=0 nodes=1 workers=1 sizes=[256]
+End: Fri Aug  7 14:47:47 CEST 2026

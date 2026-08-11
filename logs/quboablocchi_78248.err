@@ -1,0 +1,32 @@
+Traceback (most recent call last):
+  File "/home/mattia.tiso/quboproj/demo_quboablocchi.py", line 271, in <module>
+    main()
+  File "/home/mattia.tiso/quboproj/demo_quboablocchi.py", line 138, in main
+    binary_modelgpu.fit(feature_views)
+  File "/home/mattia.tiso/quboproj/gmc_cupy_multibin.py", line 806, in fit
+    results = list(
+              ^^^^^
+  File "/home/mattia.tiso/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mattia.tiso/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/mattia.tiso/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/mattia.tiso/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/mattia.tiso/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mattia.tiso/quboproj/gmc_cupy_multibin.py", line 808, in <lambda>
+    lambda node_id: self._fit_node_gpu(
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/home/mattia.tiso/quboproj/gmc_cupy_multibin.py", line 709, in _fit_node_gpu
+    ).fit_distances(node_distances)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mattia.tiso/quboproj/gmc_cupy_multibin.py", line 597, in fit_distances
+    f"eigenvalues={cp.asnumpy(eigenvalues):.6}"
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to numpy.ndarray.__format__

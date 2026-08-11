@@ -1,20 +1,19 @@
 """
 adjacency.py
 ============
-Costruzione delle matrici di adiacenza W a partire da una matrice QUBO Q
-e (opzionalmente) da una soluzione corrente x*.
+Build up adjacency matrix W starting from a QUBO matrix Q
+and (optionally) from a current solution x*.
 
-Tre tipi supportati
+Three types supported
 -------------------
-- structural_trivial  : W_ij = 1 se Q_ij != 0, 0 altrimenti
+- structural_trivial  : W_ij = 1 if Q_ij != 0, 0 otherwise
 - structural_weighted : W_ij = |Q_ij|
 - solution_sensitive  : W_ij = (-1)^(x_i + x_j) * Q_ij   [può essere negativa]
 
-La matrice W è resa simmetrica prendendo (W + W^T) / 2.
+The matrix W is made symmetric by taking (W + W^T) / 2.
 
-Riferimenti
+References
 -----------
-- Slides "Pre-Processing per QSplit" (sezione Esempi di Scelta di W, C e O)
 - Zhao & Tang, arXiv:2502.16212, Sec. III-A (correlation matrix Σ)
 """
 
@@ -47,31 +46,31 @@ def build_adjacency(
     Parameters
     ----------
     Q : np.ndarray, shape (n, n)
-        Matrice QUBO (quadratica, non necessariamente simmetrica).
-    adj_type : AdjacencyType o str
-        Tipo di matrice di adiacenza da costruire.
-    x : np.ndarray, shape (n,), opzionale
-        Soluzione binaria corrente x* in {0,1}^n.
-        Obbligatoria per adj_type == 'solution_sensitive'.
+        QUBO matrix (square, not necessarily symmetric).
+    adj_type : AdjacencyType or str
+        Type of adjacency matrix to build.
+    x : np.ndarray, shape (n,), optional
+        Current binary solution x* in {0,1}^n.
+        Required for adj_type == 'solution_sensitive'.
     zero_diagonal : bool
-        Se True, azzera la diagonale di W (self-loop rimossi).
+        If True, sets the diagonal of W to zero (self-loops removed).
 
     Returns
     -------
     W : np.ndarray, shape (n, n)
-        Matrice di adiacenza simmetrica.
+        Symmetric adjacency matrix.
 
     Note
     ----
-    La variante 'solution_sensitive' può produrre valori negativi:
+    The 'solution_sensitive' variant can produce negative values:
     W_ij = (-1)^(x_i + x_j) * Q_ij.
-    Quando si usa questa W con Laplaciane standard (che assumono W >= 0)
-    occorre separarla in parte positiva e negativa (multi-view come in GMC).
+    When using this W with standard Laplacians (which assume W >= 0),
+    it is necessary to split it into positive and negative parts (multi-view as in GMC).
     """
     adj_type = AdjacencyType(adj_type)
     Q = np.asarray(Q, dtype=float)
     n = Q.shape[0]
-    assert Q.shape == (n, n), "Q deve essere quadrata."
+    assert Q.shape == (n, n), "Q must be square."
 
     # ---- matrice Q simmetrica per il calcolo delle correlazioni ----
     Q_sym = symmetrize(Q)
@@ -85,16 +84,16 @@ def build_adjacency(
     elif adj_type == AdjacencyType.SOLUTION_SENSITIVE:
         if x is None:
             raise ValueError(
-                "'solution_sensitive' richiede una soluzione x in {0,1}^n."
+                "'solution_sensitive' requires a solution x in {0,1}^n."
             )
         x = np.asarray(x, dtype=float)
-        assert x.shape == (n,), f"x deve avere forma ({n},), trovato {x.shape}."
+        assert x.shape == (n,), f"x must have shape ({n},), found {x.shape}."
         # Σ_ij = (-1)^(x_i + x_j) * Q_ij  (Zhao & Tang, eq. 9)
         signs = np.outer((-1.0) ** x, (-1.0) ** x)   # (-1)^(x_i+x_j)
         W = signs * Q_sym
 
     else:
-        raise ValueError(f"adj_type non riconosciuto: {adj_type}")
+        raise ValueError(f"adj_type not recognized: {adj_type}")
 
     if zero_diagonal:
         np.fill_diagonal(W, 0.0)
@@ -104,12 +103,11 @@ def build_adjacency(
 
 def split_signed(W: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
-    Separa una matrice W (potenzialmente con valori negativi) in parte
-    positiva W+ e parte negativa W- (entrambe non-negative).
+    Split a matrix W (potentially with negative values) in positive part W+ and negative part W- (both non-negative).
 
         W = W+ - W-
 
-    Utile per il clustering multi-view su matrici 'solution_sensitive'.
+    Useful for multi-view clustering on 'solution_sensitive' matrices.
 
     Returns
     -------
@@ -126,7 +124,7 @@ def split_signed(W: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 # ---------------------------------------------------------------------------
 
 def adjacency_stats(W: np.ndarray) -> dict:
-    """Statistiche descrittive di W (utile per debug)."""
+    """Descriptive statistics of W (useful for debugging)."""
     return {
         "shape":      W.shape,
         "min":        float(W.min()),
@@ -143,34 +141,34 @@ def prepare_multiview_from_qubo(
     Q: np.ndarray,
     x: np.ndarray,
 ) -> dict[str, np.ndarray]:
-    """Costruisce esplicitamente le viste non negative usate dal clustering.
+    """Explicitly builds the non-negative views used by the clustering.
 
     Parameters
     ----------
     Q : np.ndarray, shape (n, n)
-        Matrice QUBO globale.
+        Global QUBO matrix.
     x : np.ndarray, shape (n,)
-        Soluzione binaria corrente usata dalla vista solution-sensitive.
+        Current binary solution used by the solution-sensitive view.
 
     Returns
     -------
     views : dict[str, np.ndarray]
-        Dizionario ordinato con le viste ``structural_weighted``,
-        ``positive_sensitive`` e ``negative_sensitive``.
+        Ordered dictionary with the views ``structural_weighted``,
+        ``positive_sensitive`` and ``negative_sensitive``.
 
     Notes
     -----
-    La vista solution-sensitive con segno viene divisa come
-    ``W_sensitive = W_positive - W_negative``. Tutte le matrici restituite
-    sono simmetriche, non negative e con diagonale nulla.
+    The solution-sensitive view with sign is split as
+    ``W_sensitive = W_positive - W_negative``. All returned matrices
+    are symmetric, non-negative and have a zero diagonal.
     """
     Q = np.asarray(Q, dtype=float)
     x = np.asarray(x, dtype=float)
     if Q.ndim != 2 or Q.shape[0] != Q.shape[1]:
-        raise ValueError("Q deve essere una matrice quadrata.")
+        raise ValueError("Q must be a square matrix.")
     if x.shape != (Q.shape[0],):
         raise ValueError(
-            f"x deve avere shape ({Q.shape[0]},), trovata {x.shape}."
+            f"x must have shape ({Q.shape[0]},), found {x.shape}."
         )
 
     W_structural = build_adjacency(

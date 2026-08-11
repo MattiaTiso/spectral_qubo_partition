@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/mattia.tiso/quboproj/demo_quboablocchi.py", line 10, in <module>
+    from gmc_multibin import GMC, BinaryHierarchicalGMC
+  File "/home/mattia.tiso/quboproj/gmc_multibin.py", line 248
+    "lambda": regularization,
+    ^^^^^^^^
+SyntaxError: invalid syntax

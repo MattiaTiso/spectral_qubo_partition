@@ -1,0 +1,6 @@
+Job ID: 78193
+Node: ngnode01.e4red
+CUDA_VISIBLE_DEVICES=0
+ERROR: Unable to locate a modulefile for 'nvidia/cuda-12.5'
+Start: Wed Aug  5 03:44:18 PM UTC 2026
+End: Wed Aug  5 03:44:18 PM UTC 2026
