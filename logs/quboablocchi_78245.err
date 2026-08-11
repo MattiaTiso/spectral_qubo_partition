@@ -1,2 +1,0 @@
-/home/mattia.tiso/quboproj/gmc_cupy_multibin.py:708: UserWarning: GMCGPU: 1 componenti invece di 2; fallback k-means.
-  ).fit_distances(node_distances)

@@ -1,2 +1,0 @@
-/home/mattia.tiso/quboproj/gmc_multibin.py:351: UserWarning: GMC: 3 componenti invece di 2; 
-  ).fit_distances(node_distances)
