@@ -6,8 +6,8 @@ from sklearn.metrics import adjusted_rand_score
 
 class QuboStd:
     """
-    Classe per generare una matrice QUBO  simmetrica con blocchi.
-    Aggiunge un rumore gaussiano alla matrice QUBO generata.
+    Class for generating a symmetric QUBO matrix with blocks.
+    Adds Gaussian noise to the generated QUBO matrix.
     
     """
     def __init__(self,
@@ -61,7 +61,7 @@ class QuboStd:
     
     def stats(self, tol: float = 1e-8) -> dict[str, float]:
         if self.qubo_matrix is None:
-            raise ValueError("La matrice QUBO non è stata generata. Chiama prima il metodo 'generate()'.")
+            raise ValueError("The QUBO matrix has not been generated. Call the 'generate()' method first.")
 
         stats = {
             "mean": np.mean(self.qubo_matrix),
@@ -75,38 +75,38 @@ class QuboStd:
         
 def clusters_to_labels(clusters: list[np.ndarray],n_samples: int,) -> np.ndarray:
     """
-    Converte una lista di cluster in un vettore di etichette.
+    Convert a list of clusters into a label vector.
 
-    Esempio
+    Example
     -------
     clusters = [
         np.array([0, 2]),
         np.array([1, 3]),
     ]
 
-    risultato:
+    results:
         labels = [0, 1, 0, 1]
 
     Parameters
     ----------
     clusters : list[np.ndarray]
-        Lista degli indici appartenenti a ciascun cluster.
+        List of indices belonging to each cluster.
 
     n_samples : int
-        Numero totale di campioni.
+        Total number of samples.
 
     Returns
     -------
     np.ndarray
-        Vettore di label di forma (n_samples,).
+        Label vector of shape (n_samples,).
 
     """
 
     if n_samples <= 0 or n_samples != len(np.asarray(clusters).ravel()):
-        raise ValueError(f"n_samples non corrisponde al numero di indici nei cluster ({len(np.asarray(clusters).ravel())}).")
+        raise ValueError(f"n_samples does not correspond to the number of indices in the clusters ({len(np.asarray(clusters).ravel())}).")
 
     if  len(clusters) == 0:
-        raise ValueError("La lista dei cluster non può essere vuota.")
+        raise ValueError("The list of clusters cannot be empty.")
 
     labels = np.full( shape=n_samples,fill_value=-1,dtype=np.int32,)
     
@@ -115,7 +115,7 @@ def clusters_to_labels(clusters: list[np.ndarray],n_samples: int,) -> np.ndarray
         indices = np.asarray(cluster_indices, dtype=np.int64,).ravel()
 
         if indices.size == 0:
-            raise ValueError(f"Il cluster {cluster_id} è vuoto.")
+            raise ValueError(f"The cluster {cluster_id} is empty.")
 
         labels[indices] = cluster_id
        
@@ -124,7 +124,7 @@ def clusters_to_labels(clusters: list[np.ndarray],n_samples: int,) -> np.ndarray
         missing_indices = np.flatnonzero(labels == -1)
 
         raise ValueError(
-            "Alcuni campioni non sono stati assegnati: "
+            "Some samples have not been assigned: "
             f"{missing_indices.tolist()}."
         )
 
@@ -136,13 +136,13 @@ def balance_binary_clusters(
     n_clusters: int | None = None,
 ) -> list[np.ndarray]:
     """
-    Concatena i cluster Binary nell'ordine ricevuto e divide la
-    sequenza risultante in parti uguali.
+    Concatenate binary clusters in the order received and divide the
+    resulting sequence into equal parts.
    """
    
     if not binary_clusters:
         raise ValueError(
-            "La lista dei cluster Binary non può essere vuota."
+            "The list of binary clusters cannot be empty."
         )
 
     clusters = [np.asarray(cluster, dtype=np.int64).ravel() for cluster in binary_clusters]
@@ -151,27 +151,26 @@ def balance_binary_clusters(
         n_clusters = len(clusters)
 
     if not isinstance(n_clusters, (int, np.integer)):
-        raise TypeError("n_clusters deve essere un intero.")
+        raise TypeError("n_clusters must be an integer.")
 
     if n_clusters <= 0:
-        raise ValueError("n_clusters deve essere positivo.")
+        raise ValueError("n_clusters must be positive.")
 
     concatenated_indices = np.concatenate(clusters)
 
     if concatenated_indices.size == 0:
-        raise ValueError("I cluster Binary non contengono indici.")
+        raise ValueError("The binary clusters do not contain any indices.")
 
     if np.unique(concatenated_indices).size != concatenated_indices.size:
         raise ValueError(
-            "I cluster Binary contengono indici duplicati "
-            "o sovrapposti."
+            "The binary clusters contain duplicate or overlapping indices."
         )
 
     n_samples = concatenated_indices.size
     if n_samples % n_clusters != 0:
             raise ValueError(
-                f"Non è possibile dividere {n_samples} elementi "
-                f"in {n_clusters} parti uguali."
+                f"Divide {n_samples} elements is not possible "
+                f"in {n_clusters} equal parts."
             )
     
     # np.split divide in parti esattamente uguali.
@@ -184,8 +183,8 @@ def clusters_in_original_order(
     permutation: np.ndarray,
 ) -> list[list[int]]:
     """
-    Converte gli indici riferiti alla matrice permutata negli indici
-    originali della QUBO.
+    Convert the indices referred to the permuted matrix to the indices
+    of the original QUBO.
 
     permutation[new_position] = original_index
     """
@@ -215,7 +214,7 @@ def labels_to_clusters(
     labels: np.ndarray,
 ) -> list[np.ndarray]:
     """
-    Converte un vettore di label in una lista di cluster.
+    Convert a label vector to a list of clusters.
     """
     labels = np.asarray(labels, dtype=np.int32).ravel()
 
@@ -226,7 +225,7 @@ def print_evaluation_results(
     permutation: np.ndarray,
 ) -> None:
     """
-    Stampa ARI, differenze e composizione dei cluster.
+    Print ARI, differences and composition of clusters.
     """
     direct_ari = results["direct_ari"]
     binary_original_ari = results["binary_original_ari"]
@@ -243,48 +242,48 @@ def print_evaluation_results(
     binary_gpu_clusters = results["binary_gpu_clusters"]
 
     print("\n" + "=" * 72)
-    print("CONFRONTO DEI RISULTATI")
+    print("RESULTS COMPARISON")
     print("=" * 72)
 
     print(
-        "Dimensioni Binary originale :",
+        "Dimension original Binary:",
         [len(cluster) for cluster in binary_clusters],
     )
 
     print(
-        "Dimensioni Binary bilanciato:",
+        "Dimension balanced Binary ",
         [len(cluster) for cluster in balanced_clusters],
     )
 
-    print("Dimensioni Binary GPU:", 
+    print("Dimension GPUBinary:", 
           [len(cluster) for cluster in binary_gpu_clusters] if binary_gpu_clusters is not None else "N/A")
 
     print(
-        "Dimensioni Binary GPU bilanciato:",
+        "Dimension balanced GPU Binary:",
         [len(cluster) for cluster in balanced_gpu_clusters] if balanced_gpu_clusters is not None else "N/A",
     )
 
     print("\nAdjusted Rand Index")
     print("-------------------")
-    print(f"GMC diretto             : {direct_ari:.6f}")
-    print(f"Binary originale        : {binary_original_ari:.6f}")
-    print(f"Binary bilanciato       : {binary_balanced_ari:.6f}")
+    print(f"Direct GMC             : {direct_ari:.6f}")
+    print(f"Original Binary        : {binary_original_ari:.6f}")
+    print(f"Balanced Binary       : {binary_balanced_ari:.6f}")
     if binary_gpu_ari is not None:
-        print(f"Binary GPU bilanciato   : {binary_gpu_ari:.6f}")
+        print(f"Balanced GPU Binary   : {binary_gpu_ari:.6f}")
 
-    print("\nDifferenze")
+    print("\nDifferences")
     print("----------")
     print(
-        "Diretto - Binary bilanciato      : "
+        "Direct - Balanced Binary      : "
         f"{delta_direct_balanced:+.6f}"
     )
     print(
-        "Binary bilanciato - originale    : "
+        "Balanced Binary - Original    : "
         f"{delta_balanced_original:+.6f}"
     )
     if delta_direct_gpu_balanced is not None:
         print(
-            "Diretto - Binary GPU bilanciato  : "
+            "Direct - Balanced GPU Binary  : "
             f"{delta_direct_gpu_balanced:+.6f}"
         )
     
@@ -311,7 +310,7 @@ def print_evaluation_results(
     ) if balanced_gpu_clusters is not None else None
 
 
-    print("\nCluster Binary originali")
+    print("\nOriginalCluster Binary ")
     print("------------------------")
 
     for cluster_id, indices in enumerate(original_binary_indices):
@@ -320,7 +319,7 @@ def print_evaluation_results(
             f"{indices}, size={len(indices)}"
         )
 
-    print("\nCluster Binary bilanciati")
+    print("\nBalanced Cluster Binary ")
     print("-------------------------")
 
     for cluster_id, indices in enumerate(balanced_binary_indices):
@@ -329,7 +328,7 @@ def print_evaluation_results(
             f"{indices}, size={len(indices)}"
         )
 
-    print("\nCluster Binary GPU originali")
+    print("\n Cluster GPU Binary ")
     print("------------------------")       
     if binary_gpu_indices is not None:
         for cluster_id, indices in enumerate(binary_gpu_indices):
@@ -338,7 +337,7 @@ def print_evaluation_results(
                 f"{indices}, size={len(indices)}"
             )
 
-    print("\nCluster Binary GPU bilanciati")
+    print("\nBalancedCluster Binary GPU ")
     print("------------------------------")
     if balanced_gpu_indices is not None:
         for cluster_id, indices in enumerate(balanced_gpu_indices):
@@ -358,7 +357,7 @@ def evaluate_clusterings(
     
 ) -> dict:
     """
-    Calcola ARI e differenze tra GMC diretto, Binary originale e Binary bilanciato seriale e con GPU.
+    Computing ARI and differences between Direct GMC, Original Binary and Balanced Binary serial and GPU.
     """
     true_labels = np.asarray(true_labels, dtype=np.int32).ravel()
     direct_labels = np.asarray(direct_labels, dtype=np.int32).ravel()
@@ -368,7 +367,7 @@ def evaluate_clusterings(
 
     if not (true_labels.size == direct_labels.size == binary_labels.size):
         raise ValueError(
-            "I vettori di label devono avere la stessa dimensione."
+            "Labels vectors must have the same dimension."
         )
 
     direct_ari = adjusted_rand_score(true_labels, direct_labels)

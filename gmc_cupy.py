@@ -49,18 +49,18 @@ _EPS = 1e-12
 
 def row_squared_distances_gpu(X):
     """
-    Calcola le distanze euclidee quadratiche tra le righe
-    di una matrice CuPy.
+    Compute the squared Euclidean distances between the rows
+    of a CuPy matrix.
 
     Parameters
     ----------
     X : cupy.ndarray
-        Matrice con forma (n_samples, n_features).
+        Matrix with shape (n_samples, n_features).
 
     Returns
     -------
     cupy.ndarray
-        Matrice quadrata delle distanze con forma
+        Square matrix of distances with shape
         (n_samples, n_samples).
     """
     row_norms = cp.sum(X * X, axis=1)
@@ -76,7 +76,7 @@ def row_squared_distances_gpu(X):
 
 def project_simplex_rows_gpu(V):
     """
-    Proietta ogni riga di V sul simplesso:
+    Project each row of V onto the simplex:
 
         x >= 0
         sum(x) = 1
@@ -84,12 +84,12 @@ def project_simplex_rows_gpu(V):
     Parameters
     ----------
     V : cupy.ndarray
-        Matrice da proiettare.
+        Matrix to project.
 
     Returns
     -------
     cupy.ndarray
-        Matrice con ogni riga proiettata sul simplesso.
+        Matrix with each row projected onto the simplex.
     """
     if V.shape[1] == 1:
         return cp.ones_like(V)
@@ -127,10 +127,10 @@ def project_simplex_rows_gpu(V):
 
 def _neighbours_gpu(E, k_nn):
     """
-    Restituisce i k nearest neighbours e il vicino successivo.
+    Returns the k nearest neighbours and the next neighbour.
 
-    Il vicino successivo viene usato nel calcolo dei pesi
-    della matrice di similarità.
+    The next neighbour is used in the calculation of the weights
+    of the similarity matrix.
     """
     order = cp.argsort(E, axis=1)
 
@@ -142,7 +142,7 @@ def _neighbours_gpu(E, k_nn):
 
 def _initialize_similarity_gpu(E_input, k_nn):
     """
-    Inizializza la matrice di similarità per una vista.
+    Initialize the similarity matrix for a view.
     """
     E = E_input.copy()
     n = int(E.shape[0])
@@ -198,7 +198,7 @@ def _update_similarity_gpu(
     k_nn,
 ):
     """
-    Aggiorna la matrice di similarità di una singola vista.
+    Update the similarity matrix for a single view.
     """
     E = E_input.copy()
     n = int(E.shape[0])
@@ -255,7 +255,7 @@ def _update_similarity_gpu(
 
 def _update_weights_gpu(similarities, U):
     """
-    Aggiorna i pesi associati alle viste.
+    Update the weights associated with the views.
     """
     norms = cp.stack(
         [
@@ -281,7 +281,7 @@ def _update_u_gpu(
     regularization,
 ):
     """
-    Aggiorna la matrice unificata U.
+    Update the unified matrix U.
     """
     n_views = len(similarities)
     n = int(similarities[0].shape[0])
@@ -339,10 +339,10 @@ def _update_u_gpu(
 
 class GMCGPU:
     """
-    Implementazione GPU di GMC.
+    GPU implementation of GMC.
 
-    L'interfaccia pubblica dei risultati è compatibile
-    con il modello GMC seriale.
+    The public interface of the results is compatible
+    with the serial GMC model.
     """
 
     def __init__(
@@ -379,7 +379,7 @@ class GMCGPU:
     @property
     def gpu_dtype(self):
         """
-        Restituisce il dtype CuPy richiesto.
+        Returns the required CuPy dtype.
         """
         if self.dtype == "float32":
             return cp.float32
@@ -393,22 +393,22 @@ class GMCGPU:
 
     def _check_gpu(self):
         """
-        Verifica che CuPy e CUDA siano utilizzabili.
+        Verifies that CuPy and CUDA are available.
         """
         if cp is None or not cupy_available():
             raise RuntimeError(
-                "CuPy/CUDA non disponibile."
+                "CuPy/CUDA not available."
             )
 
     def fit(self, feature_views):
         """
-        Esegue GMC partendo dalle feature originali.
+        Executes GMC starting from the original features.
         """
         self._check_gpu()
 
         if not feature_views:
             raise ValueError(
-                "Serve almeno una vista."
+                "At least one feature view is required."
             )
 
         gpu_views = []
@@ -424,8 +424,8 @@ class GMCGPU:
 
             if X.ndim != 2 or X.shape[1] == 0:
                 raise ValueError(
-                    f"Vista {view_id}: "
-                    "attesa matrice 2D non vuota."
+                    f"View {view_id}: "
+                    "expected non-empty 2D matrix."
                 )
 
             if n_samples is None:
@@ -433,16 +433,16 @@ class GMCGPU:
 
             elif int(X.shape[0]) != n_samples:
                 raise ValueError(
-                    "Tutte le viste devono avere "
-                    "lo stesso numero di righe."
+                    "All views must have "
+                    "the same number of rows."
                 )
 
             if not bool(
                 cp.all(cp.isfinite(X)).item()
             ):
                 raise ValueError(
-                    f"Vista {view_id}: "
-                    "contiene valori non finiti."
+                    f"View {view_id}: "
+                    "contains non-finite values."
                 )
 
             gpu_views.append(X)
@@ -456,7 +456,7 @@ class GMCGPU:
 
     def fit_distances(self, distance_views):
         """
-        Esegue GMC partendo da matrici di distanza già calcolate.
+        Executes GMC starting from already calculated distance matrices.
         """
         self._check_gpu()
 
@@ -464,7 +464,7 @@ class GMCGPU:
 
         if not distance_views:
             raise ValueError(
-                "Serve almeno una matrice di distanza."
+                "At least one distance matrix is required."
             )
 
         E_list = []
@@ -485,8 +485,8 @@ class GMCGPU:
                 or E.shape[0] != E.shape[1]
             ):
                 raise ValueError(
-                    f"Vista {view_id}: "
-                    "attesa matrice quadrata."
+                    f"View {view_id}: "
+                    "expected square matrix."
                 )
 
             if n is None:
@@ -494,28 +494,28 @@ class GMCGPU:
 
             elif E.shape != (n, n):
                 raise ValueError(
-                    "Tutte le matrici di distanza "
-                    "devono avere la stessa forma."
+                    "All distance matrices "
+                    "must have the same shape."
                 )
 
             if not bool(
                 cp.all(cp.isfinite(E)).item()
             ):
                 raise ValueError(
-                    f"Vista {view_id}: "
-                    "contiene valori non finiti."
+                    f"View {view_id}: "
+                    "contains non-finite values."
                 )
 
             E_list.append(E)
 
         if n < 2:
             raise ValueError(
-                "Servono almeno due campioni."
+                "At least two samples are required."
             )
 
         if self.k > n:
             raise ValueError(
-                "k non può superare il numero di campioni."
+                "k cannot exceed the number of samples."
             )
 
         if n == 2 and self.k == 2:
@@ -725,16 +725,15 @@ class GMCGPU:
 
 class BinaryHierarchicalGMCGPU:
     """
-    Gerarchia binaria basata su GMCGPU.
+    Hierarchical binary based on GMCGPU.
 
-    In modalità GPU, i nodi indipendenti appartenenti allo
-    stesso livello vengono elaborati contemporaneamente.
+    In GPU mode, independent nodes belonging to the
+    same level are processed simultaneously.
 
-    La concorrenza è limitata da max_parallel_nodes.
+    The concurrency is limited by max_parallel_nodes.
 
-    Ogni worker utilizza uno stream CUDA indipendente.
-    Prima di passare al livello successivo viene applicata
-    una barriera di sincronizzazione implicita tramite
+    Any worker uses an independent CUDA stream.
+    Before moving to the next level, an implicit synchronization barrier is applied via
     ThreadPoolExecutor.
     """
 
@@ -751,7 +750,7 @@ class BinaryHierarchicalGMCGPU:
     ):
         if k < 1 or k & (k - 1):
             raise ValueError(
-                "k deve essere una potenza di due."
+                "k must be a power of two."
             )
 
         if execution_mode not in {
@@ -760,8 +759,8 @@ class BinaryHierarchicalGMCGPU:
             "auto",
         }:
             raise ValueError(
-                "execution_mode deve essere "
-                "serial, parallel o auto."
+                "execution_mode must be "
+                "serial, parallel or auto."
             )
 
         if dtype not in {
@@ -769,8 +768,8 @@ class BinaryHierarchicalGMCGPU:
             "float64",
         }:
             raise ValueError(
-                "dtype deve essere "
-                "'float32' oppure 'float64'."
+                "dtype must be "
+                "'float32' or 'float64'."
             )
 
         self.k = int(k)
@@ -813,7 +812,7 @@ class BinaryHierarchicalGMCGPU:
             and not cupy_available()
         ):
             raise RuntimeError(
-                "CuPy/CUDA non disponibile."
+                "CuPy/CUDA not available."
             )
 
         return self.execution_mode
@@ -825,26 +824,26 @@ class BinaryHierarchicalGMCGPU:
         device_id,
     ):
         """
-        Esegue la bisezione GPU di un singolo nodo.
+        Executes the GPU bisection of a single node.
 
-        Il metodo viene eseguito da un worker del
+        The method is executed by a worker of the
         ThreadPoolExecutor.
 
-        Ogni worker crea uno stream CUDA non bloccante
-        indipendente, in modo che più nodi appartenenti
-        allo stesso livello possano sovrapporre le proprie
-        operazioni sulla GPU.
+        Each worker creates an independent CUDA stream
+         such that more nodes belonging
+        to the same level can overlap their
+        operations on the GPU.
 
         Parameters
         ----------
         node_id : int
-            Identificatore del nodo da dividere.
+            Identifier of the node to be bisected.
 
         global_distances : list[cupy.ndarray]
-            Matrici globali delle distanze, una per vista.
+            Global distance matrices, one for each view.
 
         device_id : int
-            Identificatore della GPU allocata al processo.
+            Identifier of the GPU allocated to the process.
 
         Returns
         -------
@@ -856,8 +855,8 @@ class BinaryHierarchicalGMCGPU:
 
         if global_indices.size < 2:
             raise RuntimeError(
-                f"Il nodo {node_id} contiene "
-                "meno di due campioni."
+                f"The node {node_id} contains "
+                "less than two samples."
             )
 
         stream = cp.cuda.Stream(
@@ -913,8 +912,8 @@ class BinaryHierarchicalGMCGPU:
             or right_indices.size == 0
         ):
             raise RuntimeError(
-                f"La bisezione GPU del nodo {node_id} "
-                "ha prodotto un cluster vuoto."
+                f"The GPU bisection of node {node_id} "
+                "produced an empty cluster."
             )
 
         return (
@@ -925,11 +924,11 @@ class BinaryHierarchicalGMCGPU:
 
     def fit(self, global_feature_views):
         """
-        Costruisce la gerarchia binaria.
+        Builds the binary hierarchy.
 
-        In modalità parallela, tutti i nodi appartenenti
-        allo stesso livello vengono elaborati concorrentemente,
-        fino al limite max_parallel_nodes.
+        In parallel mode, all nodes belonging
+        to the same level are processed concurrently,
+        up to the limit max_parallel_nodes.
         """
         mode = self._resolved_mode()
 
@@ -978,7 +977,7 @@ class BinaryHierarchicalGMCGPU:
 
             device_name = properties.get(
                 "name",
-                "GPU sconosciuta",
+                "Unknown GPU",
             )
 
             if isinstance(device_name, bytes):
@@ -1009,9 +1008,8 @@ class BinaryHierarchicalGMCGPU:
             for X in gpu_views
         ]
 
-        # global_distances viene costruita sullo stream
-        # corrente. Sincronizziamo prima di permettere
-        # agli stream dei worker di leggere le matrici.
+        # global_distances is built on the current stream.
+        # We synchronize before allowing workers to read the matrices.
         cp.cuda.get_current_stream().synchronize()
 
         self.distance_views_ = global_distances
@@ -1061,7 +1059,7 @@ class BinaryHierarchicalGMCGPU:
                 )
 
             if workers == 1:
-                # Percorso senza overhead del thread pool.
+                # Path without thread pool overhead.
                 results = [
                     self._fit_node_gpu(
                         node_id,
@@ -1072,12 +1070,12 @@ class BinaryHierarchicalGMCGPU:
                 ]
 
             else:
-                # executor.map restituisce i risultati
-                # nello stesso ordine di current_ids.
+                # executor.map returns the results
+                # in the same order as current_ids.
                 #
-                # In questo modo gli ID dei figli rimangono
-                # deterministici anche se i worker terminano
-                # in ordine differente.
+                # In this way the IDs of the children remain
+                # deterministic even if the workers terminate
+                # in a different order.
                 with ThreadPoolExecutor(
                     max_workers=workers,
                     thread_name_prefix=(
@@ -1097,9 +1095,9 @@ class BinaryHierarchicalGMCGPU:
                         )
                     )
 
-            # A questo punto tutti i worker del livello
-            # hanno terminato. Questa è la barriera tra
-            # un livello dell'albero e il successivo.
+            # At this point all workers of the level
+            # have completed. This is the barrier between
+            # a level of the tree and the next.
             child_ids = []
 
             for (
@@ -1137,8 +1135,8 @@ class BinaryHierarchicalGMCGPU:
 
             current_ids = child_ids
 
-            # Sicurezza aggiuntiva prima di iniziare
-            # il livello successivo.
+            # Additional safety before starting
+            # the next level.
             cp.cuda.Device(device_id).synchronize()
 
             level_elapsed = (
@@ -1194,8 +1192,8 @@ class BinaryHierarchicalGMCGPU:
             )
 
             raise RuntimeError(
-                "Alcuni campioni non sono stati "
-                f"assegnati: {missing.tolist()}."
+                "Some samples have not been assigned: "
+                f"{missing.tolist()}."
             )
 
         return self

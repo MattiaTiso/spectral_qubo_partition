@@ -12,7 +12,7 @@ from gmc_cupy_multibin import BinaryHierarchicalGMCGPU
 from qubovalidate import QuboStd, evaluate_clusterings, labels_to_clusters, clusters_to_labels, print_evaluation_results
 
 # ---------------------------------------------------------------------
-#  Demo principale
+#  Demo main
 # ---------------------------------------------------------------------
 
 def main() -> None:
@@ -27,7 +27,7 @@ def main() -> None:
     n_variables = n_blocks * block_size
     x = np.random.randint(0, 2, size=n_variables)
     # -------------------------------------------------------------
-    # A. Costruzione della QUBO
+    # A. QUBO generation
     # -------------------------------------------------------------
 
 
@@ -54,22 +54,22 @@ def main() -> None:
     
 
     print("=" * 72)
-    print("MATRICE QUBO ORIGINALE")
+    print("ORIGINAL QUBO MATRIX")
     print("=" * 72)
 
     print(f"Shape                 : {Q.shape}")
-    print(f"Numero di variabili   : {n_variables}")
-    print(f"Numero di cluster     : {n_blocks}")
-    print(f"Dimensione dei blocchi: {block_size}")
-    print(f"Matrice simmetrica    : {np.allclose(Q, Q.T)}")
-    print(f"Cluster ottimali      : {expected_clusters}")
+    print(f"Number of variables   : {n_variables}")
+    print(f"Number of clusters     : {n_blocks}")
+    print(f"Dimension of blocks: {block_size}")
+    print(f"Symmetric matrix    : {np.allclose(Q, Q.T)}")
+    print(f"Optimal clusters      : {expected_clusters}")
 
 
     
-    #Modelli da Testare
+    #Testing models
     
     # -------------------------------------------------------------
-    # B. GMC diretto
+    # B. Direct GMC 
     # -------------------------------------------------------------
 
     direct_model = GMC(
@@ -83,7 +83,7 @@ def main() -> None:
     )
 
     direct_model.fit(feature_views)
-    print("Fine GMC diretto.")
+    print("Ending Direct GMC.")
 
     # -------------------------------------------------------------
     # C. BinaryHierarchicalGMC
@@ -115,12 +115,12 @@ def main() -> None:
         from laplacian import cupy_available
         gpu_available = cupy_available()
         if not gpu_available:
-            print("CuPy disponibile ma GPU non rilevata. Saltando l'esecuzione del GMC GPU.")
+            print("CuPy available but GPU not detected. Skipping GPU GMC execution.")
     except ImportError:
-        print("CuPy non disponibile. Saltando l'esecuzione del GMC GPU.")
+        print("CuPy not available. Skipping GPU GMC execution.")
 
     if gpu_available:
-        print("GPU disponibile.\n")
+        print("GPU available.\n")
         binary_modelgpu = BinaryHierarchicalGMCGPU(
             k=n_blocks,
             execution_mode="parallel",
@@ -133,47 +133,47 @@ def main() -> None:
         )
         try:
             if binary_modelgpu._resolved_mode() == "parallel":
-                print("Esecuzione del GMC GPU in modalità parallela.")
+                print("Execution of GPU GMC in parallel mode.")
                 binary_start_gpu = time.perf_counter()
                 binary_modelgpu.fit(feature_views)
                 binary_elapsed_seconds_gpu = time.perf_counter() - binary_start_gpu
                 binary_gpu_labels = binary_modelgpu.labels_
                 binary_gpu_clusters = binary_modelgpu.clusters_
         except ImportError:
-            print("GPU non disponibile.")
+            print("GPU not available.")
             binary_elapsed_seconds_gpu = 0
             binary_gpu_labels = []
             binary_gpu_clusters = []
             
     # -------------------------------------------------------------
-    # E. Controlli sui risultati
+    # E. Results validation
     # -------------------------------------------------------------
     
 
     if direct_model.labels_ is None:
         raise RuntimeError(
-            "Il GMC diretto non ha prodotto alcuna label."
+            "The Direct GMC did not produce any labels."
         )
 
     if binary_model.labels_ is None:
         raise RuntimeError(
-            "Il Binary GMC non ha prodotto alcuna label."
+            "The Binary GMC did not produce any labels."
         )
     try:
         if cupy_available() is False:
-            print("GMC GPU non eseguito a causa di GPU o CuPy non disponibile.")
+            print("GMC GPU not executed due to missing GPU or CuPy.")
         elif binary_gpu_labels is None or len(binary_gpu_labels) == 0:
             raise RuntimeError(
-                "Il Binary GMC GPU non ha prodotto alcuna label."
+                "The Binary GMC GPU did not produce any labels."
             )
     except:
         pass
     
     if len(binary_model.clusters_) != n_blocks:
         raise RuntimeError(
-            "Il Binary GMC non ha prodotto il numero atteso "
-            f"di cluster: ottenuti {len(binary_model.clusters_)}, "
-            f"attesi {n_blocks}."
+            "The Binary GMC did not produce the expected number "
+            f"of clusters: produced {len(binary_model.clusters_)}, "
+            f"expected {n_blocks}."
         )
 
     # -------------------------------------------------------------
@@ -191,30 +191,30 @@ def main() -> None:
     )
 
     # -------------------------------------------------------------
-    # G. Stampa dei tempi
+    # G. Printing execution times
     # -------------------------------------------------------------
 
     print("\n" + "=" * 72)
-    print("TEMPI DI ESECUZIONE")
+    print("EXECUTION TIMES")
     print("=" * 72)
 
     print(
-        "GMC diretto:",
-        f"{direct_model.elapsed_seconds_:.6f} secondi",
+        "Direct GMC:",
+        f"{direct_model.elapsed_seconds_:.6f} seconds",
     )
 
     print(
         "BinaryHierarchicalGMC:",
-        f"{binary_elapsed_seconds:.6f} secondi",
+        f"{binary_elapsed_seconds:.6f} seconds",
     )
 
     print(
         "BinaryHierarchicalGMCGPU:",
-        f"{binary_elapsed_seconds_gpu:.6f} secondi",
+        f"{binary_elapsed_seconds_gpu:.6f} seconds",
     ) if binary_elapsed_seconds_gpu != 0 else "N/A"
 
     # -------------------------------------------------------------
-    # H. Stampa del confronto
+    # H. Printing comparisons
     # -------------------------------------------------------------
 
     print_evaluation_results(
@@ -222,31 +222,31 @@ def main() -> None:
        permutation=permutation)
 
     # -------------------------------------------------------------
-    # I. Label prodotte
+    # I. Printing produced labels
     # -------------------------------------------------------------
 
     print("\n" + "=" * 72)
-    print("LABEL NELL'ORDINE PERMUTATO")
+    print("PERMUTED LABELS")
     print("=" * 72)
 
     print("Ground truth:")
     print(expected_labels)
 
-    print("\nGMC diretto:")
+    print("\nDirect GMC:")
     print(direct_model.labels_)
 
-    print("\nBinary originale:")
+    print("\nOriginal Binary:")
     print(binary_model.labels_)
 
-    print("\nBinary bilanciato:")
+    print("\nBalanced Binary:")
     print(clusters_to_labels(results["balanced_clusters"], n_samples=len(expected_labels)))
 
     # -------------------------------------------------------------
-    # J. Struttura dell'albero binario
+    # J. Tree structure
     # -------------------------------------------------------------
 
     print("\n" + "=" * 72)
-    print("STRUTTURA DELL'ALBERO BINARY")
+    print("TREE STRUCTURE CPU")
     print("=" * 72)
 
     for node_id in sorted(binary_model.nodes_):

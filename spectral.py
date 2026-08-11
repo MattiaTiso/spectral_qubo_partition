@@ -61,7 +61,7 @@ def spectral_bisection(W: np.ndarray, balance="median", tolerance=1e-8):
     if components == 2:
         return labels
     if components != 1:
-        raise ValueError("La bisezione Fiedler richiede un grafo connesso o due componenti.")
+        raise ValueError("The Fiedler bisection requires a connected graph or two components.")
     L, _ = build_laplacian(W, LaplacianType.UNNORMALIZED)
     _, vector, _ = fiedler_vector(L, tolerance)
     if balance == "median":
@@ -71,4 +71,4 @@ def spectral_bisection(W: np.ndarray, balance="median", tolerance=1e-8):
         return labels
     if balance == "sign":
         return (vector >= 0).astype(np.int32)
-    raise ValueError("balance deve essere median o sign.")
+    raise ValueError("balance must be median or sign.")

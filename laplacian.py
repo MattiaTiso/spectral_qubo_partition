@@ -74,7 +74,7 @@ def random_walk_eigenpairs(W: np.ndarray, number: int):
     W = np.asarray(W, dtype=float)
     d = degree_vector(W)
     if np.any(d <= 0):
-        raise ValueError("NCut random-walk richiede gradi strettamente positivi.")
+        raise ValueError("NCut random-walk requires strictly positive degrees.")
     D = np.diag(d)
     L = D - W
     number = min(max(int(number), 1), W.shape[0])
@@ -112,7 +112,7 @@ def fiedler_vector(L: np.ndarray, tolerance=1e-8):
     number = min(3, L.shape[0])
     values, vectors = smallest_eigenpairs(L, number)
     if values[0] >= tolerance or values[1] <= tolerance:
-        raise ValueError("Il vettore di Fiedler richiede un unico autovalore nullo.")
+        raise ValueError("Fiedler vector requires a single zero eigenvalue.")
     gap = values[2] - values[1] if len(values) > 2 else np.nan
     return values[1], vectors[:, 1], gap
 
@@ -137,7 +137,7 @@ def smallest_eigenpairs_gpu(L, number: int, *, tolerance=1e-8,
                             dense_eigh_threshold=32):
     """Use partial thick-restart Lanczos on large GPU matrices, dense fallback otherwise."""
     if cp is None:
-        raise RuntimeError("CuPy non disponibile.")
+        raise RuntimeError("CuPy not available.")
     n = int(L.shape[0])
     number = min(max(int(number), 1), n)
     use_dense = n <= dense_eigh_threshold or number >= n - 1
@@ -151,7 +151,7 @@ def smallest_eigenpairs_gpu(L, number: int, *, tolerance=1e-8,
             return values[order], vectors[:, order]
         except Exception as error:
             warnings.warn(
-                f"eigsh GPU fallito ({error}); fallback a cp.linalg.eigh.",
+                f"eigsh GPU failed ({error}); fallback to cp.linalg.eigh.",
                 stacklevel=2,
             )
     

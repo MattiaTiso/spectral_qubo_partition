@@ -28,24 +28,24 @@ _EPS = 1e-12
 def validate_feature_views(views, *, require_square=False):
     """Validate views; rows must agree, feature dimensions may differ."""
     if not views:
-        raise ValueError("Serve almeno una vista.")
+        raise ValueError("At least one view is required.")
     validated = []
     n_samples = None
     for view_id, view in enumerate(views):
         X = np.ascontiguousarray(np.asarray(view, dtype=np.float64))
         if X.ndim != 2 or X.shape[1] == 0:
-            raise ValueError(f"Vista {view_id}: attesa matrice 2D non vuota.")
+            raise ValueError(f"View {view_id}: expected non-empty 2D matrix.")
         if n_samples is None:
             n_samples = X.shape[0]
         elif X.shape[0] != n_samples:
-            raise ValueError("Tutte le viste devono avere lo stesso numero di righe.")
+            raise ValueError("All views must have the same number of rows.")
         if require_square and X.shape != (n_samples, n_samples):
-            raise ValueError(f"Vista {view_id}: attesa shape {(n_samples, n_samples)}.")
+            raise ValueError(f"View {view_id}: expected shape {(n_samples, n_samples)}.")
         if not np.isfinite(X).all():
-            raise ValueError(f"Vista {view_id}: contiene valori non finiti.")
+            raise ValueError(f"View {view_id}: contains non-finite values.")
         validated.append(X)
     if n_samples is None or n_samples < 2:
-        raise ValueError("Servono almeno due data point.")
+        raise ValueError("At least two data points are required.")
     return validated, n_samples
 
 
@@ -179,7 +179,7 @@ class GMC:
         start = time.perf_counter()
         E_list, n = validate_feature_views(distance_views, require_square=True)
         if self.k > n:
-            raise ValueError("k non puo' superare il numero di data point.")
+            raise ValueError("k cannot exceed the number of data points.")
         if n == 2 and self.k == 2:
             self.labels_ = np.array([0, 1], dtype=np.int32)
             self.U_ = np.array([[0.0, 1.0], [1.0, 0.0]])
@@ -291,11 +291,11 @@ class BinaryTreeNode:
 
 
 class BinaryHierarchicalGMC:
-    """Gerarchia GMC dinamica con compatibilita' binaria."""
+    """ Hierarchical GMC with binary compatibility."""
 
     def __init__(self, k, gmc_k_nn=5, gmc_max_iter=50, gmc_tol=1e-8, verbose=False):
         if k < 1:
-            raise ValueError("k deve essere almeno 1.")
+            raise ValueError("k must be at least 1.")
         self.k = int(k)
         self.depth_ = None
         self.gmc_k_nn = int(gmc_k_nn)
@@ -349,7 +349,7 @@ class BinaryHierarchicalGMC:
     def fit(self, global_feature_views):
         views, n = validate_feature_views(global_feature_views)
         if self.k > n:
-            raise ValueError("k non puo' superare il numero di data point.")
+            raise ValueError("k cannot exceed the number of data points.")
         self.distance_views_ = [row_squared_distances(X) for X in views]
         self.nodes_ = {0: BinaryTreeNode(0, 0, np.arange(n, dtype=np.int64))}
         frontier = [0]
@@ -371,7 +371,7 @@ class BinaryHierarchicalGMC:
             groups = self._component_groups(idx, model.labels_)
             if len(groups) < 2:
                 raise RuntimeError(
-                    f"GMC non ha prodotto una partizione valida per il nodo {node_id}."
+                    f"GMC did not produce a valid partition for node {node_id}."
                 )
             child_ids, next_id = self._add_children(node_id, groups, next_id)
             position = frontier.index(node_id)
@@ -389,5 +389,5 @@ class BinaryHierarchicalGMC:
             self.labels_[idx] = cluster_id
         if np.any(self.labels_ < 0):
             missing = np.flatnonzero(self.labels_ < 0)
-            raise RuntimeError(f"Campioni non assegnati: {missing.tolist()}.")
+            raise RuntimeError(f"Some samples have not been assigned: {missing.tolist()}.")
         return self
