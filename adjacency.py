@@ -30,7 +30,7 @@ class AdjacencyType(str, Enum):
 
 
 def symmetrize(W: np.ndarray) -> np.ndarray:
-    """Restituisce (W + W^T) / 2 per garantire la simmetria."""
+    """Return (W + W^T) / 2 to ensure symmetry."""
     return (W + W.T) / 2.0
 
 
@@ -41,7 +41,7 @@ def build_adjacency(
     zero_diagonal: bool = True,
 ) -> np.ndarray:
     """
-    Costruisce la matrice di adiacenza W a partire da Q.
+    Build the adjacency matrix W from the QUBO matrix Q.
 
     Parameters
     ----------
