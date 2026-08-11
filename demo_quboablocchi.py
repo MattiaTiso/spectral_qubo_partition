@@ -22,7 +22,7 @@ def main() -> None:
         linewidth=140,
     )
 
-    n_blocks = 16
+    n_blocks = 8
     block_size = 128
     n_variables = n_blocks * block_size
     x = np.random.randint(0, 2, size=n_variables)
@@ -34,10 +34,10 @@ def main() -> None:
     qubo=QuboStd(
         n_blocks=n_blocks,
         block_size=block_size,
-        diagonal_value=1000.0,
-        within_block_value=500.0,
-        between_block_value=450.0,
-        noise_std=50.0,
+        diagonal_value=10.0,
+        within_block_value=5.0,
+        between_block_value=4.5,
+        noise_std=0.5,
         random_state=42,
         loc=0.0,
     )

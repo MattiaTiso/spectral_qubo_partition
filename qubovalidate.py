@@ -255,7 +255,7 @@ def print_evaluation_results(
         [len(cluster) for cluster in balanced_clusters],
     )
 
-    print("Dimension GPUBinary:", 
+    print("Dimension GPU Binary:", 
           [len(cluster) for cluster in binary_gpu_clusters] if binary_gpu_clusters is not None else "N/A")
 
     print(
@@ -296,9 +296,9 @@ def print_evaluation_results(
         permutation=permutation,
     )
     binary_gpu_indices = clusters_in_original_order(
-        clusters=balanced_gpu_clusters,
+        clusters=binary_gpu_clusters,
         permutation=permutation,
-    ) if balanced_gpu_clusters is not None else None
+    ) if binary_gpu_clusters is not None else None
 
     balanced_binary_indices = clusters_in_original_order(
         clusters=balanced_clusters,
@@ -310,7 +310,7 @@ def print_evaluation_results(
     ) if balanced_gpu_clusters is not None else None
 
 
-    print("\nOriginalCluster Binary ")
+    print("\nOriginal Cluster Binary ")
     print("------------------------")
 
     for cluster_id, indices in enumerate(original_binary_indices):
@@ -337,7 +337,7 @@ def print_evaluation_results(
                 f"{indices}, size={len(indices)}"
             )
 
-    print("\nBalancedCluster Binary GPU ")
+    print("\nBalanced Cluster Binary GPU ")
     print("------------------------------")
     if balanced_gpu_indices is not None:
         for cluster_id, indices in enumerate(balanced_gpu_indices):
