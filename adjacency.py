@@ -8,7 +8,7 @@ Three types supported
 -------------------
 - structural_trivial  : W_ij = 1 if Q_ij != 0, 0 otherwise
 - structural_weighted : W_ij = |Q_ij|
-- solution_sensitive  : W_ij = (-1)^(x_i + x_j) * Q_ij   [può essere negativa]
+- solution_sensitive  : W_ij = (-1)^(x_i + x_j) * Q_ij   [can be negative]
 
 The matrix W is made symmetric by taking (W + W^T) / 2.
 
