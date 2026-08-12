@@ -270,7 +270,7 @@ The hierarchy repeatedly selects the largest expandable leaf and applies a two-c
 ### GMC on GPU
 
 ```python
-from gmc_cupy_multibin import GMCGPU
+from gmc_cupy_multibin_patch import GMCGPU
 
 model = GMCGPU(
     k=4,
@@ -290,7 +290,7 @@ Use `dtype="float32"` to reduce GPU memory use and potentially improve throughpu
 ### Parallel GPU hierarchy
 
 ```python
-from gmc_cupy_multibin import BinaryHierarchicalGMCGPU
+from gmc_cupy_multibin_patch import BinaryHierarchicalGMCGPU
 
 hierarchy = BinaryHierarchicalGMCGPU(
     k=8,
