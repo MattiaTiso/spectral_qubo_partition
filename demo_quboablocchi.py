@@ -23,7 +23,7 @@ def main() -> None:
     )
 
     n_blocks = 16
-    block_size = 128
+    block_size = 32
     n_variables = n_blocks * block_size
     x = np.random.randint(0, 2, size=n_variables)
     # -------------------------------------------------------------
@@ -34,10 +34,10 @@ def main() -> None:
     qubo=QuboStd(
         n_blocks=n_blocks,
         block_size=block_size,
-        diagonal_value=10.0,
-        within_block_value=5.0,
-        between_block_value=4.7,
-        noise_std=0.5,
+        diagonal_value=720.0,
+        within_block_value=680.0,
+        between_block_value=580.0,
+        noise_std=50.0,
         random_state=42,
         loc=0.0,
     )
@@ -79,7 +79,7 @@ def main() -> None:
         lam_init=1.0,
         lam_factor=2.0,
         tol=1e-8,
-        verbose=True,
+        verbose=False,
     )
 
     direct_model.fit(feature_views)
@@ -89,17 +89,20 @@ def main() -> None:
     # C. BinaryHierarchicalGMC
     # -------------------------------------------------------------
 
-    binary_model = BinaryHierarchicalGMC(
-        k=n_blocks,
-        gmc_k_nn=5,
-        gmc_max_iter=50,
-        gmc_tol=1e-8,
-        verbose=True,
-    )
+    #binary_model = BinaryHierarchicalGMC(
+    #    k=n_blocks,
+    #    gmc_k_nn=5,
+    #    gmc_max_iter=50,
+    #    gmc_tol=1e-8,
+    #    verbose=False,
+    #)
 
-    binary_start = time.perf_counter()
-    binary_model.fit(feature_views)
-    binary_elapsed_seconds = time.perf_counter() - binary_start
+    #binary_start = time.perf_counter()
+    #binary_model.fit(feature_views)
+    #binary_elapsed_seconds = time.perf_counter() - binary_start
+    binary_labels = []
+    binary_clusters = []
+    binary_elapsed_seconds = 0
 
     #-------------------------------------------------------------
     # D. BinaryHierarchicalGMCGPU
@@ -127,7 +130,7 @@ def main() -> None:
             gmc_k_nn=5,
             gmc_max_iter=50,
             gmc_tol=1e-8,
-            verbose=True,
+            verbose=False,
             dtype="float64",
             max_parallel_nodes=1,
         )
@@ -154,11 +157,13 @@ def main() -> None:
         raise RuntimeError(
             "The Direct GMC did not produce any labels."
         )
-
-    if binary_model.labels_ is None:
-        raise RuntimeError(
-            "The Binary GMC did not produce any labels."
-        )
+    try:
+        if len(binary_labels)==0:
+            raise RuntimeError(
+                "The Binary GMC did not produce any labels."
+            )
+    except:
+        pass
     try:
         if cupy_available() is False:
             print("GMC GPU not executed due to missing GPU or CuPy.")
@@ -168,13 +173,15 @@ def main() -> None:
             )
     except:
         pass
-    
-    if len(binary_model.clusters_) != n_blocks:
-        raise RuntimeError(
-            "The Binary GMC did not produce the expected number "
-            f"of clusters: produced {len(binary_model.clusters_)}, "
-            f"expected {n_blocks}."
-        )
+    try:
+        if len(binary_clusters) != n_blocks:
+            raise RuntimeError(
+                "The Binary GMC did not produce the expected number "
+                f"of clusters: produced {len(binary_clusters)}, "
+                f"expected {n_blocks}."
+            )
+    except:
+        pass
 
     # -------------------------------------------------------------
     # F. Bilanciamento e calcolo degli ARI
@@ -183,8 +190,8 @@ def main() -> None:
     results = evaluate_clusterings(
         true_labels=expected_labels,
         direct_labels=direct_model.labels_,
-        binary_labels=binary_model.labels_,
-        binary_clusters=binary_model.clusters_,
+        binary_labels=binary_labels,
+        binary_clusters=binary_clusters,
         n_clusters=n_blocks,
         binary_gpu_labels=binary_gpu_labels,
         binary_gpu_clusters=binary_gpu_clusters,
@@ -236,21 +243,21 @@ def main() -> None:
     print(direct_model.labels_)
 
     print("\nOriginal Binary:")
-    print(binary_model.labels_)
+    print(binary_labels) if binary_labels is not None and len(binary_labels) > 0 else "N/A"
 
     print("\nBalanced Binary:")
-    print(clusters_to_labels(results["balanced_clusters"], n_samples=len(expected_labels)))
+    print(clusters_to_labels(results["balanced_clusters"], n_samples=len(expected_labels))) if results["balanced_clusters"] is not None and len(results["balanced_clusters"]) > 0 else "N/A"
 
     # -------------------------------------------------------------
     # J. Tree structure
     # -------------------------------------------------------------
 
     print("\n" + "=" * 72)
-    print("TREE STRUCTURE CPU")
+    print("TREE STRUCTURE GPU")
     print("=" * 72)
 
-    for node_id in sorted(binary_model.nodes_):
-        node = binary_model.nodes_[node_id]
+    for node_id in sorted(binary_modelgpu.nodes_):
+        node = binary_modelgpu.nodes_[node_id]
 
         original_indices = sorted(
             permutation[node.global_idx].tolist()

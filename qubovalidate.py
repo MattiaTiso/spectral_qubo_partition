@@ -231,6 +231,7 @@ def print_evaluation_results(
     binary_original_ari = results["binary_original_ari"]
     binary_balanced_ari = results["binary_balanced_ari"]
     binary_gpu_ari = results["binary_gpu_ari"]
+    binary_gpu_balanced_ari = results["binary_gpu_balanced_ari"]
 
     delta_direct_balanced = results["delta_direct_balanced"]
     delta_balanced_original = results["delta_balanced_original"]
@@ -268,8 +269,8 @@ def print_evaluation_results(
     print(f"Direct GMC             : {direct_ari:.6f}")
     print(f"Original Binary        : {binary_original_ari:.6f}")
     print(f"Balanced Binary       : {binary_balanced_ari:.6f}")
-    if binary_gpu_ari is not None:
-        print(f"Balanced GPU Binary   : {binary_gpu_ari:.6f}")
+    if binary_gpu_balanced_ari is not None:
+        print(f"Balanced GPU Binary   : {binary_gpu_balanced_ari:.6f}")
 
     print("\nDifferences")
     print("----------")
@@ -360,44 +361,44 @@ def evaluate_clusterings(
     Computing ARI and differences between Direct GMC, Original Binary and Balanced Binary serial and GPU.
     """
     true_labels = np.asarray(true_labels, dtype=np.int32).ravel()
-    direct_labels = np.asarray(direct_labels, dtype=np.int32).ravel()
-    binary_labels = np.asarray(binary_labels, dtype=np.int32).ravel()
-    binary_gpu_labels = np.asarray(binary_gpu_labels, dtype=np.int32).ravel() if binary_gpu_labels is not None and len(binary_gpu_labels) > 0 else None
+    direct_labels = np.asarray(direct_labels, dtype=np.int32).ravel() if direct_labels is not None and len(direct_labels) > 0 else []
+    binary_labels = np.asarray(binary_labels, dtype=np.int32).ravel() if binary_labels is not None and len(binary_labels) > 0 else []
+    binary_gpu_labels = np.asarray(binary_gpu_labels, dtype=np.int32).ravel() if binary_gpu_labels is not None and len(binary_gpu_labels) > 0 else []
 
 
-    if not (true_labels.size == direct_labels.size == binary_labels.size):
+    if not (true_labels.size == direct_labels.size):
         raise ValueError(
             "Labels vectors must have the same dimension."
         )
 
-    direct_ari = adjusted_rand_score(true_labels, direct_labels)
-    binary_original_ari = adjusted_rand_score(true_labels, binary_labels)
-    binary_gpu_ari = adjusted_rand_score(true_labels, binary_gpu_labels) if binary_gpu_labels is not None and len(binary_gpu_labels) > 0 else None
+    direct_ari = adjusted_rand_score(true_labels, direct_labels) if direct_labels is not None and len(direct_labels) > 0 else 0
+    binary_original_ari = adjusted_rand_score(true_labels, binary_labels) if binary_labels is not None and len(binary_labels) > 0 else 0
+    binary_gpu_ari = adjusted_rand_score(true_labels, binary_gpu_labels) if binary_gpu_labels is not None and len(binary_gpu_labels) > 0 else 0
 
     balanced_clusters = balance_binary_clusters(
         binary_clusters=binary_clusters,
         n_clusters=n_clusters,
-    )
+    ) if binary_clusters is not None and len(binary_clusters) > 0 else []
     balanced_gpu_clusters = balance_binary_clusters(
         binary_clusters=binary_gpu_clusters,
         n_clusters=n_clusters,
-    ) if binary_gpu_clusters is not None and len(binary_gpu_clusters) > 0 else None
+    ) if binary_gpu_clusters is not None and len(binary_gpu_clusters) > 0 else []
     
     balanced_labels = clusters_to_labels(
         clusters=balanced_clusters,
         n_samples=true_labels.size,
-    )
+    ) if balanced_clusters is not None and len(balanced_clusters) > 0 else []
     balanced_gpu_labels = clusters_to_labels(
         clusters=balanced_gpu_clusters,
         n_samples=true_labels.size,
-    ) if binary_gpu_clusters is not None and len(binary_gpu_clusters) > 0 else None
+    ) if balanced_gpu_clusters is not None and len(balanced_gpu_clusters) > 0 else []
 
-    binary_balanced_ari = adjusted_rand_score(true_labels, balanced_labels)
-    binary_gpu_balanced_ari = adjusted_rand_score(true_labels, balanced_gpu_labels) if binary_gpu_labels is not None and len(binary_gpu_labels) > 0 else None
+    binary_balanced_ari = adjusted_rand_score(true_labels, balanced_labels) if balanced_labels is not None and len(balanced_labels) > 0 else 0
+    binary_gpu_balanced_ari = adjusted_rand_score(true_labels, balanced_gpu_labels) if balanced_gpu_labels is not None and len(balanced_gpu_labels) > 0 else 0
 
-    delta_direct_balanced = direct_ari - binary_balanced_ari
-    delta_direct_gpu_balanced = direct_ari - binary_gpu_balanced_ari if binary_gpu_labels is not None and len(binary_gpu_labels) > 0 else None
-    delta_balanced_original = binary_balanced_ari - binary_original_ari
+    delta_direct_balanced = direct_ari - binary_balanced_ari if balanced_labels is not None and len(balanced_labels) > 0 else 0
+    delta_direct_gpu_balanced = direct_ari - binary_gpu_balanced_ari if balanced_gpu_labels is not None and len(balanced_gpu_labels) > 0 else 0
+    delta_balanced_original = binary_balanced_ari - binary_original_ari if balanced_labels is not None and len(balanced_labels) > 0 else 0
 
     return {
         "direct_ari": direct_ari,
