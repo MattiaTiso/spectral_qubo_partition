@@ -51,14 +51,14 @@ QUBO matrix Q and optional binary solution x*
 
 ```text
 .
-├── adjacency.py             # QUBO adjacency construction and multiview preparation
-├── demo_quboablocchi.py     # Demo entry point / experimental scaffold
-├── gmc_multibin.py          # CPU GMC and binary hierarchical GMC
-├── gmc_cupy_multibin.py     # CuPy/CUDA GMC and parallel GPU hierarchy
-├── laplacian.py             # Shared CPU/GPU Laplacian and spectral operations
-├── qubovalidate.py          # Synthetic QUBO generation and clustering evaluation
-├── spectral.py              # Spectral clustering and Fiedler bisection
-├── requirements.txt         # Python dependencies
+├── adjacency.py                   # QUBO adjacency construction and multiview preparation
+├── demo_quboablocchi.py           # Demo entry point / experimental scaffold
+├── gmc_multibin.py                # CPU GMC and binary hierarchical GMC
+├── gmc_cupy_multibin_patch.py     # CuPy/CUDA GMC and parallel GPU hierarchy
+├── laplacian.py                   # Shared CPU/GPU Laplacian and spectral operations
+├── qubovalidate.py                # Synthetic QUBO generation and clustering evaluation
+├── spectral.py                    # Spectral clustering and Fiedler bisection
+├── requirements.txt               # Python dependencies
 └── README.md
 ```
 
@@ -127,12 +127,6 @@ Given a current binary solution $x^*$,
 
 $$
 W_{ij} = (-1)^{x_i^* + x_j^*}Q_{ij}.
-$$
-
-The matrix is symmetrized as
-
-$$
-W \leftarrow \frac{W + W^\top}{2}.
 $$
 
 Signed matrices can be split into non-negative positive and negative parts:
