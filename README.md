@@ -116,7 +116,7 @@ This view preserves only the interaction pattern.
 #### Structural weighted adjacency
 
 $$
-W_{ij} = Q_{ij}.
+W_{ij} = |Q_{ij}|.
 $$
 
 This view preserves interaction magnitudes and signs before any subsequent non-negative view preparation.
