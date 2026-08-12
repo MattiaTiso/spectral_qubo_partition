@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/mattia.tiso/quboproj/demo_quboablocchi.py", line 10, in <module>
+    from gmc_multibin import GMC, BinaryHierarchicalGMC
+  File "/home/mattia.tiso/quboproj/gmc_multibin.py", line 382
+    f"leaves={len(frontier)} size={self.nodes_[child_id].global_idx.size for child_id in child_ids} "
+                                                                         ^^^
+SyntaxError: f-string: expecting '=', or '!', or ':', or '}'

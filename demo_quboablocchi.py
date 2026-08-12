@@ -8,7 +8,7 @@ import numpy as np
 from adjacency import prepare_multiview_from_qubo
 
 from gmc_multibin import GMC, BinaryHierarchicalGMC
-from gmc_cupy_multibin import BinaryHierarchicalGMCGPU
+from gmc_cupy_multibin_patch import BinaryHierarchicalGMCGPU
 from qubovalidate import QuboStd, evaluate_clusterings, labels_to_clusters, clusters_to_labels, print_evaluation_results
 
 # ---------------------------------------------------------------------
@@ -22,7 +22,7 @@ def main() -> None:
         linewidth=140,
     )
 
-    n_blocks = 8
+    n_blocks = 16
     block_size = 128
     n_variables = n_blocks * block_size
     x = np.random.randint(0, 2, size=n_variables)
@@ -36,7 +36,7 @@ def main() -> None:
         block_size=block_size,
         diagonal_value=10.0,
         within_block_value=5.0,
-        between_block_value=4.5,
+        between_block_value=4.7,
         noise_std=0.5,
         random_state=42,
         loc=0.0,

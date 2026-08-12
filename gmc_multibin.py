@@ -379,7 +379,8 @@ class BinaryHierarchicalGMC:
             if self.verbose:
                 print(
                     f"[Hierarchy-CPU] node={node_id} components={len(groups)} "
-                    f"leaves={len(frontier)} target={self.k}"
+                    f"leaves={len(frontier)} size={[self.nodes_[child_id].global_idx.size for child_id in child_ids]} "
+                    f" target={self.k} "
                 )
         self.clusters_ = [
             self.nodes_[node_id].global_idx.copy() for node_id in frontier

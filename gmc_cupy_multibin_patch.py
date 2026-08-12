@@ -662,7 +662,7 @@ class GMCGPU:
 
 
 class BinaryHierarchicalGMCGPU(BinaryHierarchicalGMC):
-    """Dynamic GPU hierarchy, parallel for logical level."""
+    """Size-first GPU hierarchy with speculative parallel node splitting."""
 
     def __init__(
         self,
@@ -693,7 +693,7 @@ class BinaryHierarchicalGMCGPU(BinaryHierarchicalGMC):
         return self.execution_mode
 
     def _fit_node_gpu(self, node_id, global_distances, device_id):
-        """Prepare a node in an independent CUDA stream."""
+        """Process a node in an independent CUDA stream."""
         node = self.nodes_[node_id]
         global_indices = node.global_idx
         if global_indices.size < 2:
@@ -724,33 +724,34 @@ class BinaryHierarchicalGMCGPU(BinaryHierarchicalGMC):
             )
         return node_id, groups
 
-    def _select_level_batch(self, frontier):
-        """Select deterministically the nodes to be processed in parallel.
+    def _select_speculative_batch(self, frontier, split_cache):
+        """Select expandable leaves globally by decreasing cluster size.
 
-        The minimum expandable level is chosen. Within the level, the nodes are
-        sorted by decreasing size and then by frontier order. The batch is limited
-        to the minimum number of binary splits required to reach the target,
-        reducing the overshoot.
+        The first node is the exact node that the serial CPU hierarchy would
+        commit next. Additional uncached nodes are returned only for speculative
+        parallel evaluation. Their results do not modify the hierarchy until
+        they become the largest leaf in a later iteration.
         """
-        expandable = [
-            node_id for node_id in frontier if self.nodes_[node_id].global_idx.size >= 2
-        ]
-        if not expandable:
-            return []
-
-        level = min(self.nodes_[node_id].level for node_id in expandable)
         position = {node_id: pos for pos, node_id in enumerate(frontier)}
-        same_level = [
-            node_id for node_id in expandable if self.nodes_[node_id].level == level
+        candidates = [
+            node_id
+            for node_id in frontier
+            if self.nodes_[node_id].global_idx.size >= 2
         ]
-        same_level.sort(
+        candidates.sort(
             key=lambda node_id: (
                 -self.nodes_[node_id].global_idx.size,
                 position[node_id],
             )
         )
-        remaining = self.k - len(frontier)
-        return same_level[: min(remaining, len(same_level))]
+        if not candidates:
+            return None, []
+
+        commit_id = candidates[0]
+        prefetch_ids = [
+            node_id for node_id in candidates if node_id not in split_cache
+        ][: self.max_parallel_nodes]
+        return commit_id, prefetch_ids
 
     def fit(self, global_feature_views):
         mode = self._resolved_mode()
@@ -784,16 +785,20 @@ class BinaryHierarchicalGMCGPU(BinaryHierarchicalGMC):
         self.nodes_ = {0: BinaryTreeNode(0, 0, np.arange(n, dtype=np.int64))}
         frontier = [0]
         next_id = 1
+        split_cache = {}
         self.level_timings_ = []
 
         while len(frontier) < self.k:
-            selected_ids = self._select_level_batch(frontier)
-            if not selected_ids:
+            commit_id, selected_ids = self._select_speculative_batch(
+                frontier,
+                split_cache,
+            )
+            if commit_id is None:
                 break
 
-            level = self.nodes_[selected_ids[0]].level
+            iteration_start = time.perf_counter()
             workers = min(self.max_parallel_nodes, len(selected_ids))
-            level_start = time.perf_counter()
+            cache_hit = commit_id in split_cache
 
             if self.verbose:
                 sizes = [
@@ -801,53 +806,75 @@ class BinaryHierarchicalGMCGPU(BinaryHierarchicalGMC):
                     for node_id in selected_ids
                 ]
                 print(
-                    f"[Hierarchy-GPU] level={level} nodes={len(selected_ids)} "
-                    f"workers={workers} sizes={sizes}"
+                    f"[Hierarchy-GPU] commit={commit_id} "
+                    f"prefetch_nodes={len(selected_ids)} "
+                    f"workers={workers} sizes={sizes} cache_hit={cache_hit}"
                 )
 
-            # ThreadPoolExecutor used at each level. Each worker uses
-            # an independent CUDA stream; executor.map preserves the order of the batch.
-            with ThreadPoolExecutor(
-                max_workers=workers,
-                thread_name_prefix=f"gmc-level-{level}",
-            ) as executor:
-                results = list(
-                    executor.map(
-                        lambda node_id: self._fit_node_gpu(
-                            node_id,
-                            global_distances,
-                            device_id,
-                        ),
-                        selected_ids,
+            results = []
+            if selected_ids:
+                # ThreadPoolExecutor is retained: speculative node splits are
+                # evaluated concurrently in independent CUDA streams.
+                with ThreadPoolExecutor(
+                    max_workers=workers,
+                    thread_name_prefix="gmc-speculative",
+                ) as executor:
+                    results = list(
+                        executor.map(
+                            lambda node_id: self._fit_node_gpu(
+                                node_id,
+                                global_distances,
+                                device_id,
+                            ),
+                            selected_ids,
+                        )
                     )
+
+                # Batch barrier: all speculative results are complete before
+                # they are inserted into the cache.
+                cp.cuda.Device(device_id).synchronize()
+                for node_id, groups in results:
+                    split_cache[node_id] = groups
+
+            if commit_id not in split_cache:
+                raise RuntimeError(
+                    f"Missing speculative split for selected node {commit_id}."
                 )
 
-            # Level barrier: no child is processed before all
-            # the selected nodes for this level have completed.
-            cp.cuda.Device(device_id).synchronize()
+            # Only the globally largest leaf is committed. This reproduces the
+            # CPU hierarchy's size-first decision while retaining GPU prefetch.
+            groups = split_cache.pop(commit_id)
+            child_ids, next_id = self._add_children(
+                commit_id,
+                groups,
+                next_id,
+            )
+            commit_position = frontier.index(commit_id)
+            frontier[commit_position : commit_position + 1] = child_ids
 
-            replacements = {node_id: groups for node_id, groups in results}
-            new_frontier = []
-            for node_id in frontier:
-                groups = replacements.get(node_id)
-                if groups is None:
-                    new_frontier.append(node_id)
-                    continue
-                child_ids, next_id = self._add_children(
-                    node_id,
-                    groups,
-                    next_id,
-                )
-                new_frontier.extend(child_ids)
-            frontier = new_frontier
+            # Cached results are valid only while their immutable tree node is
+            # still an active leaf. Drop stale entries defensively.
+            frontier_set = set(frontier)
+            stale_ids = [
+                node_id for node_id in split_cache if node_id not in frontier_set
+            ]
+            for node_id in stale_ids:
+                del split_cache[node_id]
 
-            elapsed = time.perf_counter() - level_start
+            elapsed = time.perf_counter() - iteration_start
             self.level_timings_.append(
                 {
-                    "level": level,
+                    "level": self.nodes_[commit_id].level,
                     "nodes": len(selected_ids),
                     "parallel_workers": workers,
                     "components": [len(groups) for _, groups in results],
+                    "committed_node": commit_id,
+                    "committed_size": int(
+                        self.nodes_[commit_id].global_idx.size
+                    ),
+                    "committed_components": len(groups),
+                    "cache_hit": cache_hit,
+                    "cache_size_after": len(split_cache),
                     "leaves_after": len(frontier),
                     "wall_seconds": elapsed,
                 }
@@ -855,8 +882,9 @@ class BinaryHierarchicalGMCGPU(BinaryHierarchicalGMC):
 
             if self.verbose:
                 print(
-                    f"[Hierarchy-GPU] level={level} completed "
-                    f"leaves={len(frontier)}/{self.k} time={elapsed:.6f}s"
+                    f"[Hierarchy-GPU] committed={commit_id} "
+                    f"leaves={len(frontier)}/{self.k} "
+                    f"cache={len(split_cache)} time={elapsed:.6f}s"
                 )
 
         self.clusters_ = [
