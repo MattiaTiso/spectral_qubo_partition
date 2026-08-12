@@ -164,7 +164,7 @@ Distance matrices can also be supplied directly through `fit_distances()`.
 For each view, GMC learns a row-stochastic similarity matrix $S^{(v)}$. Rows are projected onto the probability simplex
 
 $$
-\Delta = \left\{s \in \mathbb{R}^n : s_i \geq 0,\ \sum_i s_i = 1\right\}.
+\Delta = \\{s \in \mathbb{R}^n : s_i \geq 0,\quad \sum_i s_i = 1 \\}.
 $$
 
 The implementation uses the sorting-based Euclidean projection associated with Duchi et al. [3] and stated directly for the probability simplex by Wang and Carreira-Perpiñán [4].
