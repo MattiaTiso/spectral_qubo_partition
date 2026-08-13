@@ -27,12 +27,16 @@ class CutType(str, Enum):
 def spectral_embedding(W: np.ndarray, k: int, cut_type=CutType.NCUT):
     """Return the method-appropriate spectral embedding and eigenvalues."""
     cut_type = CutType(cut_type)
-    if cut_type == CutType.NCUT:
-        values, vectors = random_walk_eigenpairs(W, k)
-        return values, vectors
-    L, _ = build_laplacian(W, LaplacianType.UNNORMALIZED)
-    values, vectors = smallest_eigenpairs(L, k)
-    if cut_type == CutType.RATIOCUT:
+    #if cut_type == CutType.NCUT:
+    #    values, vectors = random_walk_eigenpairs(W, k)
+    #    return values, vectors
+    if cut_type==CutType.NCUT: 
+        L, _ = build_laplacian(W, LaplacianType.SYMMETRIC_NORMALIZED)
+        values, vectors = smallest_eigenpairs(L, k)
+    if cut_type==CutType.RATIOCUT: 
+        L, _ = build_laplacian(W, LaplacianType.UNNORMALIZED)
+        values, vectors = smallest_eigenpairs(L, k)
+    if cut_type != CutType.MINCUT:
         vectors = normalize(vectors, norm="l2", axis=1)
     return values, vectors
 
@@ -57,7 +61,7 @@ def spectral_bisection(W: np.ndarray, balance="median", tolerance=1e-8):
 
     If W already has exactly two components, return those components directly.
     """
-    labels, components = connected_components_labels(W, tolerance)
+    labels, components = connected_components_labels(W, tolerance) 
     if components == 2:
         return labels
     if components != 1:
