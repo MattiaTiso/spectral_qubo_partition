@@ -2,14 +2,17 @@
 from __future__ import annotations
 
 import time
+import spectral
 
 import numpy as np
 
-from adjacency import prepare_multiview_from_qubo
+from adjacency import prepare_multiview_from_qubo, build_adjacency, AdjacencyType  
 
 from gmc_multibin import GMC, BinaryHierarchicalGMC
 from gmc_cupy_multibin_patch import BinaryHierarchicalGMCGPU
 from qubovalidate import QuboStd, evaluate_clusterings, labels_to_clusters, clusters_to_labels, print_evaluation_results
+from single_view import single_view_clustering
+from naive_gmc import naive_gmc_clustering
 
 # ---------------------------------------------------------------------
 #  Demo main
@@ -21,11 +24,11 @@ def main() -> None:
         suppress=True,
         linewidth=140,
     )
-
-    n_blocks = 16
-    block_size = 32
-    n_variables = n_blocks * block_size
-    x = np.random.randint(0, 2, size=n_variables)
+    # Set up the QUBO parameters
+    n_blocks = 48 # number of blocks (clusters)
+    block_size = 30 # size of each block (cluster)
+    n_variables = n_blocks * block_size # number of variables in the QUBO matrix
+    x = np.random.randint(0, 2, size=n_variables) # random binary initial solution vector
     # -------------------------------------------------------------
     # A. QUBO generation
     # -------------------------------------------------------------
@@ -46,7 +49,12 @@ def main() -> None:
 
     Q, expected_labels, permutation = qubo.qperm()
     expected_clusters = labels_to_clusters(expected_labels)
-    feature_views= prepare_multiview_from_qubo(Q, x=x).values()
+
+    # Choose the features for the clustering algorithm. In this case, we will use the multiview representation of the QUBO matrix.
+
+    feature_views = prepare_multiview_from_qubo(Q, x=x).values()
+
+    # -------------------------------------------------------------
     stats = qubo.stats()
     print(f"density: {stats['density']}\n")
     
@@ -100,9 +108,10 @@ def main() -> None:
     #binary_start = time.perf_counter()
     #binary_model.fit(feature_views)
     #binary_elapsed_seconds = time.perf_counter() - binary_start
-    binary_labels = []
-    binary_clusters = []
-    binary_elapsed_seconds = 0
+
+    binary_labels = [] # binary_model.labels_ when binary_model is executed
+    binary_clusters = [] # binary_model.clusters_ when binary_model is executed
+    binary_elapsed_seconds = 0 # comment out when binary_model is executed
 
     #-------------------------------------------------------------
     # D. BinaryHierarchicalGMCGPU
@@ -147,6 +156,19 @@ def main() -> None:
             binary_elapsed_seconds_gpu = 0
             binary_gpu_labels = []
             binary_gpu_clusters = []
+
+    #---------------------------------------------------------
+    # Single View method
+    #---------------------------------------------------------
+    W = build_adjacency(Q=Q, adj_type = AdjacencyType.STRUCTURAL_WEIGHTED)
+    sw_clusters, sw_labels = single_view_clustering(W,k=n_blocks)
+
+    #---------------------------------------------------------
+    # Naive GMC method
+    #---------------------------------------------------------
+    W = build_adjacency(Q=Q, adj_type = AdjacencyType.SOLUTION_SENSITIVE, x=x)
+    ngmc_clusters, ngmc_labels = naive_gmc_clustering(W,k=n_blocks)
+
             
     # -------------------------------------------------------------
     # E. Results validation
@@ -184,12 +206,12 @@ def main() -> None:
         pass
 
     # -------------------------------------------------------------
-    # F. Bilanciamento e calcolo degli ARI
+    # F. Computing evaluation metrics
     # -------------------------------------------------------------
-
+   
     results = evaluate_clusterings(
         true_labels=expected_labels,
-        direct_labels=direct_model.labels_,
+        direct_labels=direct_model.labels_, # direct_labels = sw_labels or ngmc_labels 
         binary_labels=binary_labels,
         binary_clusters=binary_clusters,
         n_clusters=n_blocks,
@@ -255,24 +277,25 @@ def main() -> None:
     print("\n" + "=" * 72)
     print("TREE STRUCTURE GPU")
     print("=" * 72)
+    try:
+        for node_id in sorted(binary_modelgpu.nodes_):
+            node = binary_modelgpu.nodes_[node_id]
 
-    for node_id in sorted(binary_modelgpu.nodes_):
-        node = binary_modelgpu.nodes_[node_id]
+            original_indices = sorted(
+                permutation[node.global_idx].tolist()
+            )
 
-        original_indices = sorted(
-            permutation[node.global_idx].tolist()
-        )
-
-        print(
-            f"node={node.node_id:2d} | "
-            f"level={node.level} | "
-            f"parent={str(node.parent_id):>4s} | "
-            f"left={str(node.left_child_id):>4s} | "
-            f"right={str(node.right_child_id):>4s} | "
-            f"size={len(node.global_idx):2d} | "
-            f"indici originali={original_indices}"
-        )
-
+            print(
+                f"node={node.node_id:2d} | "
+                f"level={node.level} | "
+                f"parent={str(node.parent_id):>4s} | "
+                f"left={str(node.left_child_id):>4s} | "
+                f"right={str(node.right_child_id):>4s} | "
+                f"size={len(node.global_idx):2d} | "
+                f"indici originali={original_indices}"
+            )
+    except:
+        pass
 
 if __name__ == "__main__":
     main()
