@@ -53,13 +53,12 @@ QUBO matrix Q and optional binary solution x*
 Files' dependency relations:
 
 demo_quboablocchi.py
-    ├––––––––––––––––––––––– adjacency.py
-    ├–– naive_gmc.py|–––––––––––┴––––spectral.py|–––––laplacian.py
-    ├–– single_view.py –––––––––––––––––┘                  |
-    ├–– gmc_cupy_multibin_patch.py–––––┬–––––––––––––––––––┤
-                                       |                   |       
-    ├––––––––––––––––––––––––––– gmc_multibin.py–––––––––––┘
-    ├––––––––––––––––––––––––––– qubovalidate.py
+ ├── adjacency.py
+ ├── naive_gmc.py ──> spectral.py ──> laplacian.py
+ ├── single_view.py ──┘               │  │
+ ├── gmc_cupy_multibin_patch.py ──────┬──┘
+ ├── gmc_multibin.py ─────────────────┘
+ └── qubovalidate.py
 
 Directory's structure:
 .
