@@ -6,6 +6,26 @@ from sklearn.cluster import KMeans
 import numpy as np
 
 def naive_gmc_clustering(W, k : int, cut_type = CutType.NCUT):
+"""
+    Perform a clustering adopted in Zhao and Tang (2025) on the QUBO matrix Q using a sensitive view W.
+
+    Parameters
+    ----------
+    W : np.ndarray
+        The non-negative view for clustering.
+    k : int
+        The number of clusters.
+    cut_type: CutType
+        The cut objective function
+
+    Returns
+    -------
+    clusters : list
+        A list of clusters, where each cluster is a list of indices.
+    labels : np.ndarray
+        Cluster labels for each variable.
+    """
+
     W = np.asarray(W, dtype=int)
     Wp, Wn = split_signed(W)
     valp, vecp = spectral_embedding(Wp, k, cut_type)
