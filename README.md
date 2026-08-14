@@ -9,7 +9,7 @@ A research-oriented Python implementation of **Graph-based Multi-view Clustering
 A QUBO problem is written as
 
 $$
-\min_{\\{x \in \{0,1\}^n\\}} x^\top Qx,
+\min_{x \in \\{0,1\\}^n} x^\top Qx,
 $$
 
 where $Q \in \mathbb{R}^{n \times n}$ describes linear and pairwise interactions among binary variables. This project converts those interactions into one or more graph views and applies multi-view graph clustering to identify groups of related variables. Such groups can be used as candidate sub-QUBOs in decomposition-based optimization workflows.
