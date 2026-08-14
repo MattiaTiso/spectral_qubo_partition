@@ -1,6 +1,5 @@
 from __future__ import annotations
 from spectral import spectral_embedding, spectral_cluster, CutType
-from qubovalidate import labels_to_clusters
 import numpy as np
 
 def single_view_clustering(W, k: int, cut_type=CutType.NCUT):
@@ -17,12 +16,9 @@ def single_view_clustering(W, k: int, cut_type=CutType.NCUT):
 
     Returns
     -------
-    clusters : list
-        A list of clusters, where each cluster is a list of indices.
     labels : np.ndarray
         Cluster labels for each variable.
     """
     # Perform spectral clustering on the selected view
     labels = spectral_cluster(W, k, cut_type=cut_type)
-    clusters = labels_to_clusters(labels)
-    return clusters, labels
+    return labels

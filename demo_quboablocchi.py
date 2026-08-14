@@ -25,8 +25,8 @@ def main() -> None:
         linewidth=140,
     )
     # Set up the QUBO parameters
-    n_blocks = 48 # number of blocks (clusters)
-    block_size = 30 # size of each block (cluster)
+    n_blocks = 70 # number of blocks (clusters)
+    block_size = 50 # size of each block (cluster)
     n_variables = n_blocks * block_size # number of variables in the QUBO matrix
     x = np.random.randint(0, 2, size=n_variables) # random binary initial solution vector
     # -------------------------------------------------------------
@@ -161,13 +161,15 @@ def main() -> None:
     # Single View method
     #---------------------------------------------------------
     W = build_adjacency(Q=Q, adj_type = AdjacencyType.STRUCTURAL_WEIGHTED)
-    sw_clusters, sw_labels = single_view_clustering(W,k=n_blocks)
+    sw_labels = single_view_clustering(W,k=n_blocks)
+    sw_clusters = labels_to_clusters(sw_labels)
 
     #---------------------------------------------------------
     # Naive GMC method
     #---------------------------------------------------------
     W = build_adjacency(Q=Q, adj_type = AdjacencyType.SOLUTION_SENSITIVE, x=x)
-    ngmc_clusters, ngmc_labels = naive_gmc_clustering(W,k=n_blocks)
+    ngmc_labels = naive_gmc_clustering(W,k=n_blocks)
+    ngmc_clusters = labels_to_clusters(ngmc_labels)
 
             
     # -------------------------------------------------------------

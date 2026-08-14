@@ -1,12 +1,11 @@
 from __future__ import annotations
 from adjacency import split_signed 
 from spectral import spectral_embedding, spectral_cluster, CutType
-from qubovalidate import labels_to_clusters
 from sklearn.cluster import KMeans
 import numpy as np
 
 def naive_gmc_clustering(W, k : int, cut_type = CutType.NCUT):
-"""
+    """
     Perform a clustering adopted in Zhao and Tang (2025) on the QUBO matrix Q using a sensitive view W.
 
     Parameters
@@ -15,13 +14,10 @@ def naive_gmc_clustering(W, k : int, cut_type = CutType.NCUT):
         The non-negative view for clustering.
     k : int
         The number of clusters.
-    cut_type: CutType
-        The cut objective function
+    
 
     Returns
     -------
-    clusters : list
-        A list of clusters, where each cluster is a list of indices.
     labels : np.ndarray
         Cluster labels for each variable.
     """
@@ -41,8 +37,7 @@ def naive_gmc_clustering(W, k : int, cut_type = CutType.NCUT):
     
     labels = KMeans(n_clusters=k, n_init=20,
                   random_state=42).fit_predict(vec)
-    clusters = labels_to_clusters(labels)
-    return clusters, labels
+    return  labels
 
 
 
