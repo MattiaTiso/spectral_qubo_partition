@@ -217,7 +217,7 @@ $$
 (D-W)y = \lambda Dy.
 $$
 
-The Normalized Cut formulation and its generalized eigenvalue relaxation originate from Shi and Malik [6]. If the graph already has exactly $k$ connected components, their labels are returned directly. Otherwise, k-means is applied to the first $k$ spectral vectors.
+The Normalized Cut formulation and its generalized eigenvalue relaxation can be equivalentely derived by using eigenvalues of symmetric normalized laplacian and row normalization as well [6], which we implement. If the graph already has exactly $k$ connected components, their labels are returned directly. Otherwise, k-means is applied to the first $k$ spectral vectors.
 
 ## Quick Start
 
@@ -501,10 +501,10 @@ GPU eigensolvers and parallel execution may still exhibit small floating-point v
 
 ## References
 
-1. W. Zhao and G. Tang, “Clustering-Based Sub-QUBO Extraction for Hybrid QUBO Solvers,” *arXiv:2502.16212*, 2025. [doi:10.48550/arXiv.2502.16212](https://doi.org/10.48550/arXiv.2502.16212)
-2. H. Wang, Y. Yang, and B. Liu, “GMC: Graph-Based Multi-View Clustering,” *IEEE Transactions on Knowledge and Data Engineering*, vol. 32, no. 6, pp. 1116-1129, 2020. [doi:10.1109/TKDE.2019.2903810](https://doi.org/10.1109/TKDE.2019.2903810)
-3. J. Duchi, S. Shalev-Shwartz, Y. Singer, and T. Chandra, “Efficient Projections onto the $\ell_1$-Ball for Learning in High Dimensions,” *Proceedings of the 25th International Conference on Machine Learning*, pp. 272-279, 2008. [doi:10.1145/1390156.1390191](https://doi.org/10.1145/1390156.1390191)
-4. W. Wang and M. Á. Carreira-Perpiñán, “Projection onto the Probability Simplex: An Efficient Algorithm with a Simple Proof, and an Application,” *arXiv:1309.1541*, 2013. [doi:10.48550/arXiv.1309.1541](https://doi.org/10.48550/arXiv.1309.1541)
-5. U. von Luxburg, “A Tutorial on Spectral Clustering,” *Statistics and Computing*, vol. 17, pp. 395-416, 2007. [doi:10.1007/s11222-007-9033-z](https://doi.org/10.1007/s11222-007-9033-z)
-6. J. Shi and J. Malik, “Normalized Cuts and Image Segmentation,” *IEEE Transactions on Pattern Analysis and Machine Intelligence*, vol. 22, no. 8, pp. 888-905, 2000. [doi:10.1109/34.868688](https://doi.org/10.1109/34.868688)
+1. W. Zhao and G. Tang, “Clustering-Based Sub-QUBO Extraction for Hybrid QUBO Solvers,” *arXiv:2502.16212*, 2025. 
+2. H. Wang, Y. Yang, and B. Liu, “GMC: Graph-Based Multi-View Clustering,” *IEEE Transactions on Knowledge and Data Engineering*, vol. 32, no. 6, pp. 1116-1129, 2020. 
+3. J. Duchi, S. Shalev-Shwartz, Y. Singer, and T. Chandra, “Efficient Projections onto the $\ell_1$-Ball for Learning in High Dimensions,” *Proceedings of the 25th International Conference on Machine Learning*, pp. 272-279, 2008. 
+4. W. Wang and M. Á. Carreira-Perpiñán, “Projection onto the Probability Simplex: An Efficient Algorithm with a Simple Proof, and an Application,” *arXiv:1309.1541*, 2013. 
+5. U. von Luxburg, “A Tutorial on Spectral Clustering,” *Statistics and Computing*, vol. 17, pp. 395-416, 2007. 
+6. Ng, A., Jordan, M., and Weiss, Y. (2002). On spectral clustering: analysis and an algorithm. In T. Dietterich, S. Becker, and Z. Ghahramani (Eds.), Advances in Neural Information Processing Systems 14 (pp. 849 – 856). MIT Press.
 
