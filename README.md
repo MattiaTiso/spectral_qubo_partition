@@ -1,6 +1,6 @@
-# QUBO Multi-View Graph Clustering
+# QUBO Multi-View Spectral Graph Clustering
 
-A research-oriented Python implementation of **Graph-based Multi-view Clustering (GMC)** for grouping variables in Quadratic Unconstrained Binary Optimization (QUBO) problems. The repository provides direct and hierarchical clustering on CPU, optional GPU acceleration with CuPy/CUDA, graph construction utilities, spectral clustering methods, and validation tools for synthetic block-structured QUBO instances.
+A research-oriented Python implementation of **Graph-based Multi-view Clustering (GMC) and classical Spectral Graph Clustering** for grouping variables in Quadratic Unconstrained Binary Optimization (QUBO) problems. The repository provides direct and hierarchical clustering on CPU, optional GPU acceleration with CuPy/CUDA, graph construction utilities, spectral clustering methods, and validation tools for synthetic block-structured QUBO instances.
 
 > **Project status:** research prototype. The API may change, and numerical behavior should be validated on the target dataset and hardware before production use.
 
@@ -47,9 +47,20 @@ QUBO matrix Q and optional binary solution x*
 - QUBO-to-adjacency conversion, including solution-sensitive signed interactions.
 - Synthetic block-structured QUBO generation and evaluation with the Adjusted Rand Index (ARI).
 
-## Repository Structure
+## Repository Usage Structure
 
 ```text
+Files' dependency relations:
+
+demo_quboablocchi.py
+    ├––––––––––––––––––––––– adjacency.py
+    ├–– naive_gmc.py|–––––––––––┴––––spectral.py|–––––laplacian.py
+    ├–– single_view.py –––––––––––––––––┘
+    ├–– gmc_cupy_multibin_patch.py–––––┐
+    ├––––––––––––––––––––––––––– gmc_multibin.py
+    ├––––––––––––––––––––––––––– qubovalidate.py
+
+Directory's structure:
 .
 ├── adjacency.py                   # QUBO adjacency construction and multiview preparation
 ├── demo_quboablocchi.py           # Demo entry point / experimental scaffold
@@ -57,6 +68,8 @@ QUBO matrix Q and optional binary solution x*
 ├── gmc_cupy_multibin_patch.py     # CuPy/CUDA GMC and parallel GPU hierarchy
 ├── laplacian.py                   # Shared CPU/GPU Laplacian and spectral operations
 ├── qubovalidate.py                # Synthetic QUBO generation and clustering evaluation
+├── naive_gmc.py                   # Clustering method based on Zhao & Tang [1]
+├── single_view.py                 # Clustering method using the classical spectral method with one view
 ├── spectral.py                    # Spectral clustering and Fiedler bisection
 ├── requirements.txt               # Python dependencies
 └── README.md
@@ -64,7 +77,7 @@ QUBO matrix Q and optional binary solution x*
 
 ## Requirements
 
-- Python **3.10 or newer**
+- Python **3.12 or newer**
 - A working Python environment with the packages listed in `requirements.txt`
 - For GPU execution:
   - an NVIDIA GPU;
