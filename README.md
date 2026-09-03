@@ -91,7 +91,7 @@ The CPU implementation does not require CUDA. GPU availability is checked at run
 Clone the repository and create an isolated environment:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/MattiaTiso/spectral_qubo_partition.git
 cd <repository-name>
 
 python -m venv .venv
