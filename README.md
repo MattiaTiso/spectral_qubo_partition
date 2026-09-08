@@ -457,46 +457,7 @@ Additional parameters and attributes:
 - `dtype`: `"float32"` or `"float64"`;
 - `level_timings_`: per-level GPU timing and concurrency diagnostics.
 
-## Input Constraints and Numerical Notes
 
-- At least one view and at least two samples are required.
-- All feature views must have the same number of rows.
-- All input values must be finite.
-- `k` cannot exceed the number of samples.
-- Precomputed distances must be square and share the same shape.
-- GMC is sensitive to graph construction, feature scaling, `k_nn`, tolerance, and regularization updates.
-- The zero-eigenvalue test is numerical. Changing precision may alter the detected number of components.
-- Dense $n \times n$ similarities and distances require $O(n^2)$ memory per view.
-- GPU acceleration is workload- and hardware-dependent. Small matrices may be faster on CPU because of transfer, launch, and synchronization overhead.
-- In `laplacian.py`, large GPU problems use a partial eigensolver when possible and fall back to dense `cupy.linalg.eigh` if necessary.
-- Hierarchical splitting can produce unequal leaf sizes. The validation utilities include an optional post-hoc balancing operation, but that operation changes cluster membership and should be interpreted carefully.
-
-## Development Notes
-
-The current `demo_quboablocchi.py` is an experimental scaffold rather than a complete end-to-end example. The snippets in this README show the intended public APIs, but they should be adapted to the exact keys returned by `prepare_multiview_from_qubo()` and to the experiment configuration used in the repository.
-
-Recommended additions for a production-quality release include:
-
-- automated unit tests for CPU/GPU parity;
-- reproducible benchmark configurations;
-- explicit dependency version pinning;
-- continuous integration for CPU paths;
-- input validation tests for signed and sparse QUBO matrices;
-- a complete command-line demo;
-
-
-## Reproducibility
-
-For reproducible experiments:
-
-1. fix NumPy and k-means random seeds;
-2. record package, CUDA, driver, and GPU versions;
-3. store all GMC constructor parameters;
-4. preserve the QUBO permutation and current solution $x^*$;
-5. report whether `float32` or `float64` was used;
-6. save `history_` and, for GPU hierarchies, `level_timings_`.
-
-GPU eigensolvers and parallel execution may still exhibit small floating-point variations across platforms.
 
 ## References
 
