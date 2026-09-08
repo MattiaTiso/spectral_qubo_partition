@@ -92,7 +92,7 @@ Clone the repository and create an isolated environment:
 
 ```bash
 git clone https://github.com/MattiaTiso/spectral_qubo_partition.git
-cd <repository-name>
+cd spectral_qubo_partition
 
 python -m venv .venv
 source .venv/bin/activate
