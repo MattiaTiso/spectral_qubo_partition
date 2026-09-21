@@ -46,6 +46,51 @@ except ImportError:
 _EPS = 1e-12
 
 
+def _smallest_eigenpairs_hybrid_gpu(
+    laplacian,
+    n_eigenpairs,
+    tolerance,
+    dense_threshold=16,
+):
+    """Return the smallest eigenpairs using a solver suited to the request.
+
+    For a small number of requested eigenpairs, use the existing iterative
+    GPU solver. For larger requests, use CuPy's dense Hermitian eigensolver,
+    backed by NVIDIA cuSOLVER, then retain only the smallest eigenpairs.
+
+    Parameters
+    ----------
+    laplacian : cupy.ndarray
+        Symmetric graph Laplacian.
+    n_eigenpairs : int
+        Number of smallest eigenpairs to return.
+    tolerance : float
+        Tolerance forwarded to the iterative solver.
+    dense_threshold : int
+        Minimum requested eigenpair count that selects the dense solver.
+    """
+    n = int(laplacian.shape[0])
+    requested = min(max(int(n_eigenpairs), 1), n)
+
+    if requested < dense_threshold and requested < n:
+        values, vectors = smallest_eigenpairs_gpu(
+            laplacian,
+            requested,
+            tolerance=tolerance,
+        )
+        order = cp.argsort(values)
+        return values[order], vectors[:, order]
+
+    # Numerical operations can make the Laplacian very slightly asymmetric.
+    # Enforce Hermitian symmetry before calling the dense cuSOLVER routine.
+    symmetric_laplacian = 0.5 * (laplacian + laplacian.T)
+    values, vectors = cp.linalg.eigh(symmetric_laplacian)
+
+    # cp.linalg.eigh returns eigenvalues in ascending order. Slicing avoids
+    # retaining unnecessary columns in the returned eigenvector matrix.
+    return values[:requested], vectors[:, :requested]
+
+
 def row_squared_distances_gpu(X):
     """
     Computes the squared Euclidean distances between the rows
@@ -322,6 +367,7 @@ class GMCGPU:
         tol=1e-8,
         dtype="float64",
         verbose=False,
+        dense_eigen_threshold=16,
     ):
         self.k = int(k)
         self.k_nn = int(k_nn)
@@ -333,6 +379,9 @@ class GMCGPU:
 
         self.dtype = dtype
         self.verbose = bool(verbose)
+        self.dense_eigen_threshold = int(dense_eigen_threshold)
+        if self.dense_eigen_threshold < 1:
+            raise ValueError("dense_eigen_threshold must be at least 1.")
 
         self.labels_ = None
         self.U_ = None
@@ -342,6 +391,7 @@ class GMCGPU:
 
         self.history_ = []
         self.elapsed_seconds_ = None
+        self.eigensolver_ = None
 
     @property
     def gpu_dtype(self):
@@ -476,6 +526,12 @@ class GMCGPU:
             max(self.k_nn, 1),
             n - 2,
         )
+        diagnostic_count = min(n, self.k + 1)
+        self.eigensolver_ = (
+            "dense_cusolver"
+            if max(self.k, diagnostic_count) >= self.dense_eigen_threshold
+            else "iterative_smallest"
+        )
 
         similarities = [
             _initialize_similarity_gpu(
@@ -499,10 +555,11 @@ class GMCGPU:
 
         U = 0.5 * (U + U.T)
 
-        eigenvalues, F = smallest_eigenpairs_gpu(
+        eigenvalues, F = _smallest_eigenpairs_hybrid_gpu(
             unified_graph_laplacian_gpu(U),
             self.k,
             tolerance=self.tol,
+            dense_threshold=self.dense_eigen_threshold,
         )
 
         regularization = self.lam
@@ -549,10 +606,11 @@ class GMCGPU:
                 self.k + 1,
             )
 
-            values, vectors = smallest_eigenpairs_gpu(
+            values, vectors = _smallest_eigenpairs_hybrid_gpu(
                 unified_graph_laplacian_gpu(U),
                 diagnostic_count,
                 tolerance=self.tol,
+                dense_threshold=self.dense_eigen_threshold,
             )
 
             eigenvalues = values[: self.k]
@@ -714,6 +772,7 @@ class BinaryHierarchicalGMCGPU(BinaryHierarchicalGMC):
                     tol=self.gmc_tol,
                     dtype=self.dtype,
                     verbose=self.verbose,
+                    dense_eigen_threshold=16,
                 ).fit_distances(node_distances)
                 stream.synchronize()
 
