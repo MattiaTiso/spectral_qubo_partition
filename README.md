@@ -291,6 +291,7 @@ model = GMCGPU(
     max_iter=50,
     dtype="float64",
     verbose=True,
+    dense_eigh_threshold=1
 ).fit([view_1, view_2])
 
 # Public result arrays are returned as NumPy arrays.
@@ -444,7 +445,7 @@ If the final unified graph has fewer connected components than requested, the CP
 
 An important constructor parameter has to be declared:
 
-- `dense_eigh_threshold` : an integer number denoting the threshold on the number of eigenvalues after which CuPy is allowed to switch from a sparse solver to a dense solver. For example `dense_eigh_threshold = 1` means always using  a dense solver; while  `dense_eigh_threshold=16` means that for $k \geq 16 $ it will switch from `cupy_eigsh` to `cp.linalg.eigh`, otherwise it will use the sparse one (Warning: choose based on density of your initial QUBO).
+- `dense_eigh_threshold` : an integer number denoting the threshold on the number of eigenvalues after which CuPy is allowed to switch from a sparse solver to a dense solver. For example `dense_eigh_threshold = 1` means always using  a dense solver; while  `dense_eigh_threshold=16` means that for $ k \geq 16 $ it will switch from `cupy_eigsh` to `cp.linalg.eigh`, otherwise it will use the sparse one (Warning: choose based on density of your initial QUBO).
 
 ### `BinaryHierarchicalGMC`
 
