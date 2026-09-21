@@ -441,7 +441,7 @@ Important fitted attributes:
 
 If the final unified graph has fewer connected components than requested, the CPU and GPU implementations use k-means on the row-normalized spectral embedding as a fallback.
 
-### GMCGPU
+### `GMCGPU`
 
 An important constructor parameter has to be declared:
 
